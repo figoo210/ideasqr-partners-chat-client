@@ -1,0 +1,33 @@
+Users collection:
+
+    userId (string, primary key)
+    name (string, user's display name)
+    email (string, unique user identifier)
+    phone (string, optional contact info)
+    profilePic (string, url to profile image stored elsewhere)
+    role (string, reference ID to linked Roles document)
+
+Roles collection:
+
+    roleId (string, primary key)
+    name (string, role title like "Admin")
+    permissions (array of strings, list of actions role allows)
+
+ChatRoom collection:
+
+    chatId (string, primary key)
+    name (string, chat title)
+    photo (string, url to group/chat image if applicable)
+    members (array of userIds, users in the chat)
+    isGroup (boolean, differentiates direct/group chat)
+
+Messages collection:
+
+    messageId (string, primary key)
+    chatId (string, reference to parent ChatRoom doc)
+    senderId (string, reference to user doc)
+    timestamp (Timestamp, datetime message was sent)
+    message (string, content of the message)
+    reactions (array, embedded reactions on the message)
+    parentMessageId (string, reference to parent if a reply)
+    parentId (string, optional field to link replies together)
