@@ -32,17 +32,37 @@ const ChatBox = (props) => {
   const [messageAction, setMessageAction] = useState(null);
 
   useEffect(() => {
+    if (props.selectedChat) {
+      let chat = props.selectedChat
+      if (!chat.is_group && props.usersData) {
+        setMembers([]);
+        props.usersData.forEach((u) => {
+          if (getOtherChatUserId(chat.chat_name, user.data.id) === u.id) {
+            setChatDisplayName(u.name);
+          }
+        });
+      } else {
+        setChatDisplayName(chat.chat_name);
+        setMembers(chat.chat_members);
+      }
+      setMessages(chat.messages);
+    }
+
+    if (lastJsonMessage !== null) {
+      setMessages([...messages, JSON.parse(lastJsonMessage)]);
+    }
+
     // get chat room if exist and create one if not exist
     if (props.currentChat) {
       const getChatData = (chatId) => {
         api.getChatOrCreate(chatId).then((chat) => {
-          if (!chat.is_group) {
+          if (!chat.is_group && props.usersData) {
             setMembers([]);
-            api
-              .getUser(getOtherChatUserId(chat.chat_name, user.data.id))
-              .then((response) => {
-                setChatDisplayName(response.data.name);
-              });
+            props.usersData.forEach((u) => {
+              if (getOtherChatUserId(chat.chat_name, user.data.id) === u.id) {
+                setChatDisplayName(u.name);
+              }
+            });
           } else {
             setChatDisplayName(chat.chat_name);
             setMembers(chat.chat_members);

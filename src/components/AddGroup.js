@@ -15,6 +15,7 @@ import {
 } from "firebase/storage";
 import api from "../services/api";
 import MultipleSelectChip from "./MultiSelect";
+import UploadImageField from "./UploadImageField";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -32,53 +33,6 @@ function AddGroup(props) {
   const [name, setName] = useState("");
   const [members, setMembers] = useState([]);
   const [profilePic, setProfilePic] = useState("");
-  const [profilePicPreview, setProfilePicPreview] = useState(null);
-
-  const [storageState, setStorageState] = useState(null);
-  const [uploaded, setUploaded] = useState(false);
-  const [uploading, setUploading] = useState(false);
-
-  const handleProfilePicUpload = (event) => {
-    const file = event.target.files[0];
-    const storageRef = ref(
-      storage,
-      `profile_pics/${name !== "" ? name : file.name}`
-    );
-    setStorageState(storageRef);
-
-    const uploadTask = uploadBytesResumable(storageRef, file);
-    uploadTask.on(
-      "state_changed",
-      (snapshot) => {
-        setUploading(true);
-      },
-      (error) => {
-        // Handle unsuccessful uploads
-      },
-      () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          setUploading(false);
-
-          setProfilePic(downloadURL);
-          setProfilePicPreview(URL.createObjectURL(file));
-          setUploaded(true);
-        });
-      }
-    );
-  };
-
-  const deleteUploadedImage = () => {
-    // Delete the file
-    deleteObject(storageState)
-      .then(() => {
-        // File deleted successfully
-        setProfilePicPreview("");
-        setUploaded(false);
-      })
-      .catch((error) => {
-        // Uh-oh, an error occurred!
-      });
-  };
 
   const getMembers = (membersList) => {
     setMembers(membersList);
@@ -95,7 +49,7 @@ function AddGroup(props) {
     };
     console.log(newGroup);
     api.createChatGroup(newGroup).then((chat) => {
-      window.location.reload();
+      props.getAddedData(chat)
     });
 
     // Close modal after save
@@ -116,67 +70,8 @@ function AddGroup(props) {
           />
           <MultipleSelectChip getMembers={getMembers} />
         </Box>
-        {uploading ? (
-          <LoadingButton
-            loading
-            startIcon={<SaveIcon />}
-            sx={{
-              mx: 1,
-              width: "100%",
-              my: 5,
-              height: "60px",
-            }}
-            variant="outlined"
-          >
-            Uploading....
-          </LoadingButton>
-        ) : (
-          <Button
-            component="label"
-            variant="contained"
-            startIcon={uploaded ? <Done /> : <CloudUploadIcon />}
-            sx={{
-              height: "60px",
-              mx: 1,
-              width: "100%",
-              my: 3,
-            }}
-            color="warning"
-            disabled={uploaded}
-          >
-            {uploaded ? "Uploaded" : "Upload Group Picture"}
-            <VisuallyHiddenInput
-              type="file"
-              accept="image/*"
-              onChange={handleProfilePicUpload}
-            />
-          </Button>
-        )}
 
-        {profilePicPreview && (
-          <Box
-            textAlign="center"
-            display={"flex"}
-            flexDirection={"column"}
-            justifyContent={"center"}
-            alignItems={"center"}
-          >
-            <Button
-              startIcon={<Delete />}
-              color="error"
-              onClick={deleteUploadedImage}
-              sx={{ mb: 1 }}
-            >
-              Delete
-            </Button>
-            <img
-              src={profilePicPreview}
-              width="200px"
-              height="200px"
-              alt="Group Preview"
-            />
-          </Box>
-        )}
+        <UploadImageField getUrl={setProfilePic}  />
 
         <br />
         <Button

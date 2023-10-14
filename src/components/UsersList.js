@@ -47,7 +47,7 @@ export default function UsersList(props) {
               </ListItemButton>
             );
           }
-          return <></>;
+          return <span key={idx}></span>;
         })}
     </List>
   );

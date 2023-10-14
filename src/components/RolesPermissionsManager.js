@@ -95,11 +95,23 @@ const RolesPermissionsManager = () => {
 
   const handleSaveClick = () => {
     // Send editedPermissions to the server or update state as desired
-    console.log(editingRole);
     console.log(editedPermissions);
-    
-    // setEditingRole(null);
-    // setEditedPermissions({});
+    Object.keys(editedPermissions).forEach((key) => {
+      const newRP = {
+        role: key,
+        permissions: editedPermissions[key]
+      }
+      console.log(newRP);
+      api.newRolePermission(newRP).then((resp) => {
+        console.log(resp.data);
+        setRoles(resp.data);
+
+      }).catch((err) => {
+        console.log(err);
+      })
+    });
+    setEditingRole(null);
+    setEditedPermissions({});
   };
 
   return (

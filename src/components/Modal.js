@@ -29,7 +29,7 @@ export default function CustomModal(props) {
         <DialogContent>
           {/* Modal Content */}
           {props.ModalContent ? (
-            <props.ModalContent closeModal={handleClose} />
+            <props.ModalContent closeModal={handleClose} getAddedData={props.getAddedData} />
           ) : (
             ""
           )}

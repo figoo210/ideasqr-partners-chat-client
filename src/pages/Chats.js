@@ -14,6 +14,7 @@ function Chats(props) {
   const [usersData, setUsersData] = useState(null);
 
   const [currentChat, setCurrentChat] = useState(null);
+  const [selectedChat, setSelectedChat] = useState(null);
 
   const [usersModalOpen, setUsersModalOpen] = useState(false);
   const [addGroupOpen, setAddGroupOpen] = useState(false);
@@ -21,20 +22,38 @@ function Chats(props) {
   const openAddUsersModal = () => {
     setUsersModalOpen(true);
   };
+
   const openAddGroupModal = () => {
     setAddGroupOpen(true);
   };
 
   const getChat = (chatName) => {
     setCurrentChat(chatName);
+    data.forEach((e) => {
+      if (e.chat_name == chatName) {
+        setSelectedChat(e);
+      }
+    })
   };
+
+  const getAddedData = (d) => {
+    setData([...data, d]);
+  }
+
+  const getAddedUser = (d) => {
+    setUsersData([...usersData, d]);
+  }
 
   useEffect(() => {
     setData(null);
-    setUsersData(null);
     // Get Data
+    api.getUsers().then((response) => {
+      setUsersData(response.data);
+      console.log(response.data);
+    });
+
     const getData = async () => {
-      if (props.page === "Users") {
+      if (props.page === "Contact List") {
         api.getUsers().then((response) => {
           setData(response.data);
         });
@@ -48,12 +67,8 @@ function Chats(props) {
           });
           setData(groupChats);
         });
-        api.getUsers().then((response) => {
-          setUsersData(response.data);
-        });
       } else if (props.page === "Messages") {
         api.getChats().then((response) => {
-          console.log(response.data);
           let directChats = [];
           response.data.forEach((element) => {
             if (!element.is_group) {
@@ -62,14 +77,13 @@ function Chats(props) {
           });
           setData(directChats);
         });
-        api.getUsers().then((response) => {
-          setUsersData(response.data);
-        });
       }
 
       return data;
     };
+
     getData();
+
   }, [props.page]);
   return (
     <>
@@ -93,7 +107,7 @@ function Chats(props) {
             >
               {props.page}
             </Typography>
-            {props.page === "Users" && (
+            {props.page === "Contact List" && (
               <>
                 <Tooltip title="Add User">
                   <Button
@@ -110,6 +124,7 @@ function Chats(props) {
                   modalTitle={"Add User"}
                   updateOpenValue={setUsersModalOpen}
                   ModalContent={AddUser}
+                  getAddedData={getAddedUser}
                 />
               </>
             )}
@@ -130,6 +145,7 @@ function Chats(props) {
                   modalTitle={"Add Group"}
                   updateOpenValue={setAddGroupOpen}
                   ModalContent={AddGroup}
+                  getAddedData={getAddedData}
                 />
               </>
             )}
@@ -147,16 +163,16 @@ function Chats(props) {
             }}
             color="primary"
           />
-          {props.page !== "Users" && (
+          {props.page !== "Contact List" && (
             <ChatList getChat={getChat} data={data} usersData={usersData} />
           )}
-          {props.page === "Users" && (
+          {props.page === "Contact List" && (
             <UsersList getChat={getChat} data={data} />
           )}
         </Box>
       </Box>
       <Box height={"100vh"} sx={{ width: "60%", backgroundColor: "#ccc" }}>
-        <ChatBox currentChat={currentChat} usersData={usersData} />
+        <ChatBox currentChat={currentChat} selectedChat={selectedChat} usersData={usersData} />
       </Box>
     </>
   );

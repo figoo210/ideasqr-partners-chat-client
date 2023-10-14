@@ -10,45 +10,20 @@ import {
   TextField,
 } from "@mui/material";
 
-import React, { useState } from "react";
-import { styled } from "@mui/material/styles";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import { Delete, Done, Visibility, VisibilityOff } from "@mui/icons-material";
-import LoadingButton from "@mui/lab/LoadingButton";
-import SaveIcon from "@mui/icons-material/Save";
-import { storage } from "../services/firebase";
-import {
-  deleteObject,
-  getDownloadURL,
-  ref,
-  uploadBytesResumable,
-} from "firebase/storage";
+import React, { useEffect, useState } from "react";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import api from "../services/api";
-
-const VisuallyHiddenInput = styled("input")({
-  clip: "rect(0 0 0 0)",
-  clipPath: "inset(50%)",
-  height: 1,
-  overflow: "hidden",
-  position: "absolute",
-  bottom: 0,
-  left: 0,
-  whiteSpace: "nowrap",
-  width: 1,
-});
+import UploadImageField from "./UploadImageField";
 
 function AddUser(props) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [profilePic, setProfilePic] = useState("");
-  const [profilePicPreview, setProfilePicPreview] = useState(null);
   const [role, setRole] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const [storageState, setStorageState] = useState(null);
-  const [uploaded, setUploaded] = useState(false);
-  const [uploading, setUploading] = useState(false);
+  const [roles, setRoles] = useState([]);
 
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -70,48 +45,6 @@ function AddUser(props) {
     event.preventDefault();
   };
 
-  const handleProfilePicUpload = (event) => {
-    const file = event.target.files[0];
-    const storageRef = ref(
-      storage,
-      `profile_pics/${name !== "" ? name : file.name}`
-    );
-    setStorageState(storageRef);
-
-    const uploadTask = uploadBytesResumable(storageRef, file);
-    uploadTask.on(
-      "state_changed",
-      (snapshot) => {
-        setUploading(true);
-      },
-      (error) => {
-        // Handle unsuccessful uploads
-      },
-      () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          setUploading(false);
-
-          setProfilePic(downloadURL);
-          setProfilePicPreview(URL.createObjectURL(file));
-          setUploaded(true);
-        });
-      }
-    );
-  };
-
-  const deleteUploadedImage = () => {
-    // Delete the file
-    deleteObject(storageState)
-      .then(() => {
-        // File deleted successfully
-        setProfilePicPreview("");
-        setUploaded(false);
-      })
-      .catch((error) => {
-        // Uh-oh, an error occurred!
-      });
-  };
-
   const handleSubmit = (event) => {
     event.preventDefault();
     // Handle form submission here
@@ -126,11 +59,27 @@ function AddUser(props) {
       role_name: role,
       image_url: profilePic,
     };
-    api.register(newUser);
+    api.register(newUser).then((resp) => {
+      props.getAddedData(resp.data);
+    });
 
     // Close modal after save
     props.closeModal();
   };
+
+  useEffect(() => {
+
+    // Get Roles
+    api
+      .getRoles()
+      .then((response) => {
+        let data = response.data;
+        setRoles(data);
+      })
+      .catch((error) => {
+        console.log("Error: ", error);
+      });
+  }, [])
 
   return (
     <Box>
@@ -194,74 +143,13 @@ function AddUser(props) {
               required
               onChange={(event) => setRole(event.target.value)}
             >
-              <MenuItem value={"Admin"}>Admin</MenuItem>
-              <MenuItem value={"Manager"}>Manager</MenuItem>
-              <MenuItem value={"User"}>User</MenuItem>
+              {roles && roles.map((r, idx) => (
+                <MenuItem key={idx} value={r.role}>{r.role}</MenuItem>
+              ))}
             </Select>
           </FormControl>
         </Box>
-        {uploading ? (
-          <LoadingButton
-            loading
-            startIcon={<SaveIcon />}
-            sx={{
-              mx: 1,
-              width: "100%",
-              my: 5,
-              height: "60px",
-            }}
-            variant="outlined"
-          >
-            Uploading....
-          </LoadingButton>
-        ) : (
-          <Button
-            component="label"
-            variant="contained"
-            startIcon={uploaded ? <Done /> : <CloudUploadIcon />}
-            sx={{
-              height: "60px",
-              mx: 1,
-              width: "100%",
-              my: 3,
-            }}
-            color="warning"
-            disabled={uploaded}
-          >
-            {uploaded ? "Uploaded" : "Upload Profile Picture"}
-            <VisuallyHiddenInput
-              type="file"
-              accept="image/*"
-              onChange={handleProfilePicUpload}
-            />
-          </Button>
-        )}
-
-        {profilePicPreview && (
-          <Box
-            textAlign="center"
-            display={"flex"}
-            flexDirection={"column"}
-            justifyContent={"center"}
-            alignItems={"center"}
-          >
-            <Button
-              startIcon={<Delete />}
-              color="error"
-              onClick={deleteUploadedImage}
-              sx={{ mb: 1 }}
-            >
-              Delete
-            </Button>
-            <img
-              src={profilePicPreview}
-              width="200px"
-              height="200px"
-              alt="Profile Pic Preview"
-            />
-          </Box>
-        )}
-
+        <UploadImageField getUrl={setProfilePic} />
         <br />
         <Button
           type="submit"

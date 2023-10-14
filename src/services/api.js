@@ -13,7 +13,7 @@ Api.interceptors.request.use((config) => {
 export default {
   // Auth
   getIP: () => {
-    return Api.get("https://api.ipify.org/?format=json")
+    return axios.get("https://api.ipify.org/?format=json")
       .then((response) => response.json())
       .then((data) => {
         const ipAddress = data.ip;
@@ -24,6 +24,7 @@ export default {
         console.error("Error:", error);
       });
   },
+
   login: (email, password) => {
     const formData = new FormData();
     formData.append("grant_type", "password");
@@ -32,9 +33,11 @@ export default {
 
     return Api.post("/token", formData);
   },
+
   register: (user) => {
-    Api.post("/users", user);
+    return Api.post("/users", user);
   },
+
   logout: () => localStorage.removeItem("user"),
 
   // Get Users
@@ -126,5 +129,22 @@ export default {
 
   getReactions: (messageId) => {
     return Api.get(`/message_reactions/${messageId}`);
+  },
+
+  // IPs
+  getIPsGroups: () => {
+    return Api.get("/ip_groups");
+  },
+
+  addIPGroup: (ipGroup) => {
+    return Api.post("/ip_groups", ipGroup);
+  },
+
+  updateIPGroup: (ipGroup) => {
+    return Api.put("/ip_groups", ipGroup);
+  },
+
+  deleteIPGroup: (ip) => {
+    return Api.delete(`/ip_groups/${ip}`);
   },
 };

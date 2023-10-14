@@ -14,7 +14,8 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
-import axios from "axios";
+import api from "../services/api";
+import MultipleSelectChip from "./MultiSelect";
 
 const IPGroupManager = () => {
   const [ipGroups, setIPGroups] = useState([]);
@@ -30,8 +31,9 @@ const IPGroupManager = () => {
   }, []);
 
   const fetchIPGroups = async () => {
+    api.getIPsGroups();
     try {
-      const response = await axios.get("/api/ip-groups");
+      const response = await api.getIPsGroups();
       setIPGroups(response.data);
     } catch (error) {
       console.error("Error fetching IPGroups:", error);
@@ -40,7 +42,7 @@ const IPGroupManager = () => {
 
   const handleAddIPGroup = async () => {
     try {
-      await axios.post("/api/ip-groups", { ip, name, users });
+      await api.addIPGroup({ ip, name, users });
       fetchIPGroups();
       setIP("");
       setName("");
@@ -53,7 +55,8 @@ const IPGroupManager = () => {
 
   const handleUpdateIPGroup = async () => {
     try {
-      await axios.put(`/api/ip-groups/${selectedIPGroup.ip}`, { name, users });
+      console.log({ ip, name, users });
+      await api.updateIPGroup({ ip, name, users });
       fetchIPGroups();
       setName("");
       setUsers([]);
@@ -66,14 +69,15 @@ const IPGroupManager = () => {
 
   const handleEditClick = (ipGroup) => {
     setSelectedIPGroup(ipGroup);
+    setIP(ipGroup.ip)
     setName(ipGroup.name);
-    setUsers(ipGroup.users);
+    setUsers(ipGroup?.users);
     setOpenDialog(true);
   };
 
   const handleDeleteClick = async (ip) => {
     try {
-      await axios.delete(`/api/ip-groups/${ip}`);
+      await api.deleteIPGroup(ip);
       fetchIPGroups();
     } catch (error) {
       console.error("Error deleting IPGroup:", error);
@@ -98,6 +102,11 @@ const IPGroupManager = () => {
     });
   };
 
+  const getMembers = (membersList) => {
+    setUsers(membersList);
+  };
+
+
   return (
     <div>
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
@@ -120,24 +129,8 @@ const IPGroupManager = () => {
             fullWidth
             sx={{ my: 1 }}
           />
-          <h3 style={{ marginTop: 3 }}>Users</h3>
-          {users.map((user, index) => (
-            <div key={index}>
-              <TextField
-                label="User"
-                value={user}
-                onChange={(e) => handleUserChange(index, e.target.value)}
-                fullWidth
-                sx={{ my: 1 }}
-              />
-              <Button sx={{ my: 1 }} onClick={() => handleRemoveUser(index)}>
-                Remove
-              </Button>
-            </div>
-          ))}
-          <Button sx={{ my: 1 }} onClick={handleAddUser}>
-            Add User
-          </Button>
+          <h3 style={{ marginTop: 5 }}>Users</h3>
+          <MultipleSelectChip getMembers={getMembers} />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDialog(false)}>Cancel</Button>

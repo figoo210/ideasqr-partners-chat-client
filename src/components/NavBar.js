@@ -16,6 +16,7 @@ import {
   People,
   Settings,
   LockOpen,
+  Person,
 } from "@mui/icons-material";
 import { FullModal } from "./Modal";
 import avatar_img from "../assets/img/user.png";
@@ -25,20 +26,29 @@ import { AuthContext } from "../services/AuthContext";
 import UserManagement from "./UserManagement";
 import RolesPermissionsManager from "./RolesPermissionsManager";
 import IPGroupManager from "./IPGroups";
+import ProfileManagement from "./ProfileManagement";
 
 const NavBar = (props) => {
   const { user } = useContext(AuthContext);
   // Modals and toggle
   const [open, setOpen] = React.useState(false);
   const [profileModalOpen, setProfileModalOpen] = React.useState(false);
+  const [usersModalOpen, setUsersModalOpen] = React.useState(false);
   const [roleModalOpen, setRoleModalOpen] = React.useState(false);
   const [ipModalOpen, setIpModalOpen] = React.useState(false);
+
   const openProfileModal = () => {
     setProfileModalOpen(true);
   };
+
+  const openUsersModal = () => {
+    setUsersModalOpen(true);
+  };
+
   const openRoleModal = () => {
     setRoleModalOpen(true);
   };
+
   const openIpModal = () => {
     setIpModalOpen(true);
   };
@@ -122,7 +132,7 @@ const NavBar = (props) => {
             <People sx={{ color: "white" }} fontSize="medium" />
           </ListItemIcon>
           <ListItemText>
-            <Typography fontSize={18}>Users</Typography>
+            <Typography fontSize={18}>Contact List</Typography>
           </ListItemText>
         </ListItemButton>
         <br />
@@ -140,16 +150,31 @@ const NavBar = (props) => {
           <List component="div" disablePadding>
             <ListItemButton sx={{ pl: 5 }} onClick={openProfileModal}>
               <ListItemIcon>
-                <Edit sx={{ color: "white" }} fontSize="medium" />
+                <Person sx={{ color: "white" }} fontSize="medium" />
               </ListItemIcon>
               <ListItemText>
-                <Typography fontSize={18}>Edit</Typography>
+                <Typography fontSize={18}>Profile</Typography>
               </ListItemText>
             </ListItemButton>
             <FullModal
               open={profileModalOpen}
-              modalTitle={"Manage Users"}
+              modalTitle={"User Profile"}
               updateOpenValue={setProfileModalOpen}
+              ModalContent={ProfileManagement}
+            />
+
+            <ListItemButton sx={{ pl: 5 }} onClick={openUsersModal}>
+              <ListItemIcon>
+                <Edit sx={{ color: "white" }} fontSize="medium" />
+              </ListItemIcon>
+              <ListItemText>
+                <Typography fontSize={18}>Users</Typography>
+              </ListItemText>
+            </ListItemButton>
+            <FullModal
+              open={usersModalOpen}
+              modalTitle={"Manage Users"}
+              updateOpenValue={setUsersModalOpen}
               ModalContent={UserManagement}
             />
 

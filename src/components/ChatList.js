@@ -17,7 +17,7 @@ export default function ChatList(props) {
   const { user } = React.useContext(AuthContext);
 
   const getChatName = (chat) => {
-    if (!chat.is_group && props.usersData) {
+    if (!chat.is_group && props.usersData && chat.chat_name) {
       for (let i = 0; i < props.usersData.length; i++) {
         const u = props.usersData[i];
         if (u.id === getOtherChatUserId(chat.chat_name, user.data.id)) {
