@@ -44,7 +44,7 @@ export default function CustomModal(props) {
 
 export const FullModal = (props) => {
   const handleClose = () => {
-    props.updateOpenValue();
+    props.updateOpenValue(false);
   };
 
   return (

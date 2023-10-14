@@ -3,17 +3,22 @@ import { AuthContext } from "../services/AuthContext";
 import InsertEmoticonIcon from "@mui/icons-material/InsertEmoticon";
 import avatar_img from "../assets/img/user.png";
 import ReplyPopover from "./ReplyPopover";
-import {
-  Box,
-  Button,
-  Popover,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Popover, Tooltip, Typography } from "@mui/material";
 import { getLatestMessageTime } from "../services/helper";
 import EmojiPicker from "emoji-picker-react";
+import api from "../services/api";
+import { PlusOne } from "@mui/icons-material";
+
+// Emoji component
+const Emoji = ({ emoji, onEmojiClick }) => (
+  <Button sx={{ fontSize: 30, cursor: "pointer" }} onClick={onEmojiClick}>
+    {emoji}
+  </Button>
+);
 
 const Message = (props) => {
   const { user } = useContext(AuthContext);
+  const [usersData, setUsersData] = React.useState(null);
   const [isReply, setIsReply] = useState(false);
   const [isReacted, setIsReacted] = useState(false);
   const [selectedEmoji, setSelectedEmoji] = useState(null);
@@ -28,11 +33,26 @@ const Message = (props) => {
   const openEmoji = Boolean(anchorEl);
   const id = openEmoji ? "simple-popover" : undefined;
 
-  const handleReactClick = (e) => {
-    console.log(e);
-    setSelectedEmoji(e.emoji);
-    setIsReacted(true);
-    closeEmojiPicker();
+  const handleEmojiClick = (e) => {
+    // add emoji to message
+    let emoji = e.currentTarget.textContent;
+    const newReaction = {
+      message_id: props.message.id,
+      user_id: user.data.id,
+      reaction: emoji,
+    };
+    api
+      .reactOnMessage(newReaction)
+      .then((r) => {
+        console.log("reaction added");
+        setSelectedEmoji(emoji);
+        setIsReacted(true);
+        props.getMessageAction(Math.random());
+        closeEmojiPicker();
+      })
+      .catch((e) => {
+        console.log(e);
+      });
   };
 
   useEffect(() => {
@@ -45,6 +65,11 @@ const Message = (props) => {
     ) {
       setIsReply(true);
     } else setIsReply(false);
+
+    // users data
+    api.getUsers().then((response) => {
+      setUsersData(response.data);
+    });
   }, []);
 
   if (!props.message) return;
@@ -120,7 +145,14 @@ const Message = (props) => {
                 horizontal: "left",
               }}
             >
-              <EmojiPicker onEmojiClick={handleReactClick} />
+              <Box>
+                <Emoji onEmojiClick={handleEmojiClick} emoji="👍" />
+                <Emoji onEmojiClick={handleEmojiClick} emoji="❤️" />
+                <Emoji onEmojiClick={handleEmojiClick} emoji="😂" />
+                <Emoji onEmojiClick={handleEmojiClick} emoji="😮" />
+                <Emoji onEmojiClick={handleEmojiClick} emoji="😢" />
+                <Emoji onEmojiClick={handleEmojiClick} emoji="🙏" />
+              </Box>
             </Popover>
             <ReplyPopover
               style={{ flex: 1 }}
@@ -138,6 +170,54 @@ const Message = (props) => {
               {getLatestMessageTime([props.message])}
             </Typography>
           </Box>
+          {/* Reactions */}
+          {props.message.reactions && props.message.reactions.length !== 0 ? (
+            <Tooltip
+              title={props.message.reactions.map((reaction, idx) => (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                  key={idx}
+                >
+                  <Box flex={4} mx={1}>
+                    {usersData &&
+                      usersData.map((userData, idx) => {
+                        if (userData.id === reaction.user_id) {
+                          return (
+                            <Typography key={idx} variant="p">
+                              {userData?.name}
+                            </Typography>
+                          );
+                        }
+                      })}
+                  </Box>
+                  <Typography flex={1} variant="h6" mx={1}>
+                    {reaction.reaction}
+                  </Typography>
+                </Box>
+              ))}
+            >
+              <Box
+                sx={{
+                  position: "absolute",
+                  right: 10,
+                  bottom: -10,
+                  fontSize: 14,
+                  bgcolor: "#bbb",
+                  padding: 1,
+                  borderRadius: 15,
+                }}
+              >
+                <PlusOne />
+                <InsertEmoticonIcon color="action" />
+              </Box>
+            </Tooltip>
+          ) : (
+            <></>
+          )}
         </Box>
       </Box>
       {isReply && (

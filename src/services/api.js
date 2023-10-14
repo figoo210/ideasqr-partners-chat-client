@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const Api = axios.create({ baseURL: "http://0.0.0.0:8000" });
+const Api = axios.create({ baseURL: process.env.REACT_APP_SERVER_URL });
 
 Api.interceptors.request.use((config) => {
   const token = localStorage.getItem("user");
@@ -57,6 +57,31 @@ export default {
     return Api.delete(`/users/${userId}`);
   },
 
+  // Roles
+  newRolePermission: (rolePermission) => {
+    return Api.post("/role_permissions/", rolePermission);
+  },
+
+  addRole: (role) => {
+    return Api.post("/roles/", role);
+  },
+
+  addPermission: (permission) => {
+    return Api.post("/permissions/", permission);
+  },
+
+  getRoles: () => {
+    return Api.get("/roles/");
+  },
+
+  getPermissions: () => {
+    return Api.get("/permissions/");
+  },
+
+  getRolesPermissions: () => {
+    return Api.get("/role_permissions/");
+  },
+
   // Get chat room if exist and create one if not exist
   getChatOrCreate: (chatName) => {
     return Api.get(`/chats/${chatName}`)
@@ -92,5 +117,14 @@ export default {
   // Create Message
   createMessage: (message) => {
     return Api.post("/messages/", message);
+  },
+
+  // Reactions
+  reactOnMessage: (reaction) => {
+    return Api.post("/message_reactions/", reaction);
+  },
+
+  getReactions: (messageId) => {
+    return Api.get(`/message_reactions/${messageId}`);
   },
 };

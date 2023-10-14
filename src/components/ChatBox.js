@@ -25,8 +25,11 @@ const ChatBox = (props) => {
   const id = openPoper ? "simple-popper" : undefined;
 
   // WebSocket
-  const [socketUrl, setSocketUrl] = useState("ws://localhost:8000/ws/chats");
+  const [socketUrl, setSocketUrl] = useState(
+    process.env.REACT_APP_WEBSOCKET_URL
+  );
   const { sendJsonMessage, lastJsonMessage } = useWebSocket(socketUrl);
+  const [messageAction, setMessageAction] = useState(null);
 
   useEffect(() => {
     // get chat room if exist and create one if not exist
@@ -50,7 +53,7 @@ const ChatBox = (props) => {
 
       getChatData(props.currentChat);
     }
-  }, [props.currentChat, lastJsonMessage, user.data.id]);
+  }, [props.currentChat, lastJsonMessage, user.data.id, messageAction]);
 
   const handleClickSendMessage = (msg) => {
     sendJsonMessage(msg);
@@ -125,6 +128,7 @@ const ChatBox = (props) => {
             message={message}
             chatId={props.currentChat}
             sendTestMsg={handleClickSendMessage}
+            getMessageAction={setMessageAction}
           />
         ))}
       </div>
