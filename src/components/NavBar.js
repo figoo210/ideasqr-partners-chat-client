@@ -7,22 +7,42 @@ import ListItemText from "@mui/material/ListItemText";
 import Collapse from "@mui/material/Collapse";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
-import { Edit, Group, Message, People, Settings } from "@mui/icons-material";
+import HubIcon from "@mui/icons-material/Hub";
+
+import {
+  Edit,
+  Group,
+  Message,
+  People,
+  Settings,
+  LockOpen,
+} from "@mui/icons-material";
 import { FullModal } from "./Modal";
 import avatar_img from "../assets/img/user.png";
 import logoImg from "../assets/img/collaborate.png";
 import api from "../services/api";
 import { AuthContext } from "../services/AuthContext";
 import UserManagement from "./UserManagement";
+import RolesPermissionsManager from "./RolesPermissionsManager";
+import IPGroupManager from "./IPGroups";
 
 const NavBar = (props) => {
   const { user } = useContext(AuthContext);
   // Modals and toggle
   const [open, setOpen] = React.useState(false);
   const [profileModalOpen, setProfileModalOpen] = React.useState(false);
+  const [roleModalOpen, setRoleModalOpen] = React.useState(false);
+  const [ipModalOpen, setIpModalOpen] = React.useState(false);
   const openProfileModal = () => {
     setProfileModalOpen(true);
   };
+  const openRoleModal = () => {
+    setRoleModalOpen(true);
+  };
+  const openIpModal = () => {
+    setIpModalOpen(true);
+  };
+
   const handleClickToggle = () => {
     setOpen(!open);
   };
@@ -131,6 +151,36 @@ const NavBar = (props) => {
               modalTitle={"Manage Users"}
               updateOpenValue={setProfileModalOpen}
               ModalContent={UserManagement}
+            />
+
+            <ListItemButton sx={{ pl: 5 }} onClick={openRoleModal}>
+              <ListItemIcon>
+                <LockOpen sx={{ color: "white" }} fontSize="medium" />
+              </ListItemIcon>
+              <ListItemText>
+                <Typography fontSize={18}>Roles</Typography>
+              </ListItemText>
+            </ListItemButton>
+            <FullModal
+              open={roleModalOpen}
+              modalTitle={"Roles & Permissions"}
+              updateOpenValue={setRoleModalOpen}
+              ModalContent={RolesPermissionsManager}
+            />
+
+            <ListItemButton sx={{ pl: 5 }} onClick={openIpModal}>
+              <ListItemIcon>
+                <HubIcon sx={{ color: "white" }} fontSize="medium" />
+              </ListItemIcon>
+              <ListItemText>
+                <Typography fontSize={18}>IP Groups</Typography>
+              </ListItemText>
+            </ListItemButton>
+            <FullModal
+              open={ipModalOpen}
+              modalTitle={"IP Groups"}
+              updateOpenValue={setIpModalOpen}
+              ModalContent={IPGroupManager}
             />
           </List>
         </Collapse>

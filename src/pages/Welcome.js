@@ -11,10 +11,17 @@ import {
   Typography,
 } from "@mui/material";
 import { AuthContext } from "../services/AuthContext";
+import Notification from "../components/Notification";
 
 const Welcome = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const [isError, setIsError] = useState(false);
+  const [error, setError] = useState("");
+  const closeNotification = () => {
+    setIsError(false);
+  };
 
   const { login } = useContext(AuthContext);
 
@@ -26,6 +33,8 @@ const Welcome = () => {
       const errorCode = error.code;
       const errorMessage = error.message;
       console.log(errorCode, errorMessage);
+      setIsError(true);
+      setError("Wrong in email or password");
     }
   };
 
@@ -55,6 +64,14 @@ const Welcome = () => {
             sx={{ mt: 2, padding: 3, borderRadius: 5 }}
             bgcolor={"white"}
           >
+            {isError && (
+              <Notification
+                open={isError}
+                handleClose={closeNotification}
+                msgType="error"
+                msg={error}
+              />
+            )}
             <TextField
               margin="normal"
               required
