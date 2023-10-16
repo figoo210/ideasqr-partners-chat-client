@@ -84,8 +84,8 @@ const NavBar = (props) => {
             : user.data.image_url
         }
         alt="User Avatar"
-        width={150}
-        style={{ marginTop: 20 }}
+        width={100}
+        style={{ marginTop: 5 }}
       />
       <Typography variant="h6" mb={1} mt={1}>
         {user.data.name} {user.data.image_url}
@@ -93,7 +93,7 @@ const NavBar = (props) => {
       <Button
         variant="outlined"
         size="small"
-        sx={{ marginBottom: 5, paddingTop: "6px" }}
+        sx={{ marginBottom: 2, paddingTop: "5px" }}
         color="secondary"
         onClick={signOut}
       >
@@ -114,7 +114,7 @@ const NavBar = (props) => {
             <Message sx={{ color: "white" }} fontSize="medium" />
           </ListItemIcon>
           <ListItemText>
-            <Typography fontSize={18}>Messages</Typography>
+            <Typography fontSize={16}>Messages</Typography>
           </ListItemText>
         </ListItemButton>
         
@@ -123,7 +123,7 @@ const NavBar = (props) => {
             <Group sx={{ color: "white" }} fontSize="medium" />
           </ListItemIcon>
           <ListItemText>
-            <Typography fontSize={18}>Groups</Typography>
+            <Typography fontSize={16}>Groups</Typography>
           </ListItemText>
         </ListItemButton>
        
@@ -132,7 +132,7 @@ const NavBar = (props) => {
             <People sx={{ color: "white" }} fontSize="medium" />
           </ListItemIcon>
           <ListItemText>
-            <Typography fontSize={18}>Contact List</Typography>
+            <Typography fontSize={16}>Contact List</Typography>
           </ListItemText>
         </ListItemButton>
         
@@ -141,7 +141,7 @@ const NavBar = (props) => {
             <Settings sx={{ color: "white" }} fontSize="medium" />
           </ListItemIcon>
           <ListItemText>
-            <Typography fontSize={18}>Settings</Typography>
+            <Typography fontSize={16}>Settings</Typography>
           </ListItemText>
           {open ? <ExpandLess /> : <ExpandMore />}
         </ListItemButton>
@@ -153,7 +153,7 @@ const NavBar = (props) => {
                 <Person sx={{ color: "white" }} fontSize="medium" />
               </ListItemIcon>
               <ListItemText>
-                <Typography fontSize={18}>Profile</Typography>
+                <Typography fontSize={16}>Profile</Typography>
               </ListItemText>
             </ListItemButton>
             <FullModal
@@ -168,7 +168,7 @@ const NavBar = (props) => {
                 <Edit sx={{ color: "white" }} fontSize="medium" />
               </ListItemIcon>
               <ListItemText>
-                <Typography fontSize={18}>Users</Typography>
+                <Typography fontSize={16}>Users</Typography>
               </ListItemText>
             </ListItemButton>
             <FullModal
@@ -183,7 +183,7 @@ const NavBar = (props) => {
                 <LockOpen sx={{ color: "white" }} fontSize="medium" />
               </ListItemIcon>
               <ListItemText>
-                <Typography fontSize={18}>Roles</Typography>
+                <Typography fontSize={16}>Roles</Typography>
               </ListItemText>
             </ListItemButton>
             <FullModal
@@ -198,7 +198,7 @@ const NavBar = (props) => {
                 <HubIcon sx={{ color: "white" }} fontSize="medium" />
               </ListItemIcon>
               <ListItemText>
-                <Typography fontSize={18}>IP Groups</Typography>
+                <Typography fontSize={16}>IP Groups</Typography>
               </ListItemText>
             </ListItemButton>
             <FullModal

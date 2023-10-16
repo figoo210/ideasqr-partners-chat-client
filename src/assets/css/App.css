@@ -80,7 +80,7 @@ input {
 }
 .chat-bubble {
   border-radius: 20px 20px 20px 0;
-  padding: 15px;
+  padding: 5px;
   background-color: #7cc5d9;
   color: #1c2c4c;
   width: max-content;
@@ -223,9 +223,13 @@ input {
 }
 .css-knapww-MuiTypography-root{
   color:#000;
+  font-size: 1.75rem !important;
+  margin-top: 0px !important;
+
 }
 .css-qscxtw-MuiTypography-root {
-  font-size: 17px !important;
+  font-size: 16px !important;
+  line-height: 1.2;
 }
 .css-10hburv-MuiTypography-root{
   color: #f07d00;
@@ -235,13 +239,15 @@ input {
   border-radius: 50%;
 }
 .css-1iw7z4m-MuiTypography-root{
-  color:#000;
+  color:#fff;
+  font-size: 1.5rem !important;
+  bottom: 10px !important;
 }
 .messages-wrapper {
   background: #f0f1f5;
 }
 .chat-bubble {
-  padding: 15px;
+  padding: 5px;
   background-color: #eee;
   color: #000;
   box-shadow: -2px 2px 1px 1px #ccc;
@@ -295,8 +301,8 @@ input {
   background-color: #f07d00 !important;
 }
 .css-15wwp11-MuiTableHead-root tr th{
-  background-color: #000;
-  color:#fff;
+  background-color: #000 !important;
+  color:#fff !important;
 }
 .css-rqglhn-MuiTable-root {
   width: 90% !important;
@@ -308,7 +314,7 @@ input {
   box-shadow: none !important;
 }
 .css-bdhsul-MuiTypography-root-MuiDialogTitle-root{
-  color: #000;
+  color: #000 !important;
 }
 .css-1tnit8n-MuiContainer-root {
   margin-top:20px;
@@ -319,8 +325,44 @@ input {
 }
 .css-15c2ieu-MuiButtonBase-root-MuiButton-root {
   padding: 16px 16px !important;
-  color: #fff;
-  background-color: #1976d2;
   box-shadow: none;
   width: 100%;
+}
+.css-37jdci-MuiTypography-root{
+  font-size: 14px;
+}
+.react-input-emoji--input {
+  max-height: 35px !important;
+  min-height: 20px !important;
+  width: 100%;
+  padding: 0px 10px 0px;
+  text-align: left;
+}
+.css-1jd4zsf-MuiFormControl-root-MuiTextField-root {
+  margin-bottom: 10px !important;
+}
+.css-k1njc {
+  width: 100%;
+  height: 60px !important;
+  background-color: #f07d00 !important;
+  border-bottom: 1px solid;
+  position: relative;
+}
+.messages-wrapper {
+  height: auto !important;
+  max-height: 80% !important;
+}
+.css-1271sx3 {
+  padding: 15px !important;
+  margin: 0px !important;
+}
+.css-11f108z-MuiTypography-root {
+  font-size: 12px !important;
+}
+.css-1oerend-MuiTypography-root {
+  font-size: 17px !important;
+}
+.css-v398f3-MuiButtonBase-root-MuiButton-root{
+  color: #f07d00 !important;
+  border-color: #f07d00 !important;
 }
