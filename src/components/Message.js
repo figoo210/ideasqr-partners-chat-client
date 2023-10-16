@@ -172,9 +172,11 @@ const Message = (props) => {
                     )?.name}
                   <br />"
                   {props.messages &&
-                    props.messages.find(
-                      (m) => m.id === props.message.parent_message_id
-                    )?.message}
+                    displayMessage(
+                      props.messages.find(
+                        (m) => m.id === props.message.parent_message_id
+                      )?.message
+                    )}
                   "
                 </Button>
               </Typography>
