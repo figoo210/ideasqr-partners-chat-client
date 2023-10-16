@@ -18,9 +18,13 @@ export const getLatestMessage = (messagesList) => {
 export const getLatestMessageTime = (messagesList) => {
   messagesList.sort((a, b) => a.id - b.id);
   const message = messagesList[messagesList.length - 1];
-  return `${message?.created_at ? message?.created_at.split("T")[1] : "-"}\n${
-    message?.created_at ? message?.created_at.split("T")[0] : "-"
-  }`;
+  return (
+    `${message?.created_at ? message?.created_at.split("T")[1] : "-"}`
+      .split(":")
+      .slice(0, -1)
+      .join(":") +
+    `\n${message?.created_at ? message?.created_at.split("T")[0] : "-"}`
+  );
 };
 
 export const removeValueFromArray = (arr, value) => {

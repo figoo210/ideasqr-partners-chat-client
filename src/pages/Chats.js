@@ -33,23 +33,22 @@ function Chats(props) {
       if (e.chat_name == chatName) {
         setSelectedChat(e);
       }
-    })
+    });
   };
 
   const getAddedData = (d) => {
     setData([...data, d]);
-  }
+  };
 
   const getAddedUser = (d) => {
     setUsersData([...usersData, d]);
-  }
+  };
 
   useEffect(() => {
     setData(null);
     // Get Data
     api.getUsers().then((response) => {
       setUsersData(response.data);
-      console.log(response.data);
     });
 
     const getData = async () => {
@@ -83,7 +82,6 @@ function Chats(props) {
     };
 
     getData();
-
   }, [props.page]);
   return (
     <>
@@ -172,7 +170,11 @@ function Chats(props) {
         </Box>
       </Box>
       <Box height={"100vh"} sx={{ width: "60%", backgroundColor: "#ccc" }}>
-        <ChatBox currentChat={currentChat} selectedChat={selectedChat} usersData={usersData} />
+        <ChatBox
+          currentChat={currentChat}
+          selectedChat={selectedChat}
+          usersData={usersData}
+        />
       </Box>
     </>
   );

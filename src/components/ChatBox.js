@@ -33,7 +33,7 @@ const ChatBox = (props) => {
 
   useEffect(() => {
     if (props.selectedChat) {
-      let chat = props.selectedChat
+      let chat = props.selectedChat;
       if (!chat.is_group && props.usersData) {
         setMembers([]);
         props.usersData.forEach((u) => {
@@ -46,10 +46,6 @@ const ChatBox = (props) => {
         setMembers(chat.chat_members);
       }
       setMessages(chat.messages);
-    }
-
-    if (lastJsonMessage !== null) {
-      setMessages([...messages, JSON.parse(lastJsonMessage)]);
     }
 
     // get chat room if exist and create one if not exist
@@ -73,7 +69,7 @@ const ChatBox = (props) => {
 
       getChatData(props.currentChat);
     }
-  }, [props.currentChat, lastJsonMessage, user.data.id, messageAction]);
+  }, [props.currentChat, lastJsonMessage, user.data.id]);
 
   const handleClickSendMessage = (msg) => {
     sendJsonMessage(msg);
@@ -149,6 +145,8 @@ const ChatBox = (props) => {
             chatId={props.currentChat}
             sendTestMsg={handleClickSendMessage}
             getMessageAction={setMessageAction}
+            usersData={props.usersData}
+            messages={messages}
           />
         ))}
       </div>

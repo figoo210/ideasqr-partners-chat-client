@@ -3,7 +3,7 @@ import { AuthContext } from "../services/AuthContext";
 import InsertEmoticonIcon from "@mui/icons-material/InsertEmoticon";
 import avatar_img from "../assets/img/user.png";
 import ReplyPopover from "./ReplyPopover";
-import { Box, Button, Popover, Tooltip, Typography } from "@mui/material";
+import { Box, Button, Link, Popover, Tooltip, Typography } from "@mui/material";
 import { getLatestMessageTime } from "../services/helper";
 import EmojiPicker from "emoji-picker-react";
 import api from "../services/api";
@@ -18,7 +18,6 @@ const Emoji = ({ emoji, onEmojiClick }) => (
 
 const Message = (props) => {
   const { user } = useContext(AuthContext);
-  const [usersData, setUsersData] = React.useState(null);
   const [isReply, setIsReply] = useState(false);
   const [isReacted, setIsReacted] = useState(false);
   const [selectedEmoji, setSelectedEmoji] = useState(null);
@@ -65,11 +64,6 @@ const Message = (props) => {
     ) {
       setIsReply(true);
     } else setIsReply(false);
-
-    // users data
-    api.getUsers().then((response) => {
-      setUsersData(response.data);
-    });
   }, []);
 
   if (!props.message) return;
@@ -78,7 +72,6 @@ const Message = (props) => {
     <Box
       sx={{
         display: "flex",
-        direction: isReply ? "rtl" : "",
         justifyContent: "start",
         alignItems: "start",
       }}
@@ -89,166 +82,184 @@ const Message = (props) => {
         }`}
         id={props.message.id}
       >
-        <img
-          className="chat-bubble__left"
-          src={
-            !user.data.image_url || user.data.image_url === ""
-              ? avatar_img
-              : user.data.image_url
-          }
-          alt="user avatar"
-        />
-        <Box className="chat-bubble__right">
-          <Typography
-            variant="h6"
-            fontSize={16}
-            my={1}
-            color="darkcyan"
-            className="user-name"
-          >
-            {user.data.name ? user.data.name : props.message.sender_id}
-          </Typography>
-          <Typography variant="p" className="user-message">
-            {props.message.message}
-          </Typography>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              mt: 2,
-            }}
-            className="chat-bubble__actions"
-          >
-            <Button
-              className="react-button"
-              aria-describedby={id}
-              variant="text"
-              onClick={openEmojiPicker}
-              sx={{ flex: 1 }}
-            >
-              {isReacted ? (
-                <Typography fontSize={20} fontWeight={700}>
-                  {selectedEmoji ? selectedEmoji : "❤️"}
-                </Typography>
-              ) : (
-                <InsertEmoticonIcon color="info" />
-              )}
-            </Button>
-            <Popover
-              id={id}
-              open={openEmoji}
-              anchorEl={anchorEl}
-              onClose={closeEmojiPicker}
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "left",
-              }}
-            >
-              <Box>
-                <Emoji onEmojiClick={handleEmojiClick} emoji="👍" />
-                <Emoji onEmojiClick={handleEmojiClick} emoji="❤️" />
-                <Emoji onEmojiClick={handleEmojiClick} emoji="😂" />
-                <Emoji onEmojiClick={handleEmojiClick} emoji="😮" />
-                <Emoji onEmojiClick={handleEmojiClick} emoji="😢" />
-                <Emoji onEmojiClick={handleEmojiClick} emoji="🙏" />
-              </Box>
-            </Popover>
-            <ReplyPopover
-              style={{ flex: 1 }}
-              chatId={props.chatId}
-              messageId={props.message.id}
-              sendTestMsg={props.sendTestMsg}
-              scroll={props.scroll}
-            />
+        <Box
+          sx={{ direction: "ltr", display: "flex", alignItems: "flex-start" }}
+        >
+          <img
+            className="chat-bubble__left"
+            src={
+              !user.data.image_url || user.data.image_url === ""
+                ? avatar_img
+                : user.data.image_url
+            }
+            alt="user avatar"
+          />
+          <Box className="chat-bubble__right">
             <Typography
-              variant="body2"
-              color="grey"
-              flex={1}
-              textAlign={"center"}
+              variant="h6"
+              fontSize={16}
+              my={1}
+              color="darkcyan"
+              className="user-name"
             >
-              {getLatestMessageTime([props.message])}
+              {props.usersData &&
+                props.usersData.find((u) => u.id === props.message.sender_id)
+                  ?.name}
             </Typography>
-          </Box>
-          {/* Reactions */}
-          {props.message.reactions && props.message.reactions.length !== 0 ? (
-            <Tooltip
-              title={props.message.reactions.map((reaction, idx) => (
-                <Box
+            {isReply && (
+              <Typography variant="h6">
+                <Button
                   sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
+                    borderRadius: "0",
+                    backgroundColor: "transparent",
+                    color: "grey",
+                    "&:hover": {
+                      backgroundColor: "transparent",
+                    },
+                    "&:active": {
+                      backgroundColor: "transparent",
+                    },
+                    "&:focus": {
+                      boxShadow: "none",
+                    },
                   }}
-                  key={idx}
+                  href={"#" + props.message.parent_message_id}
                 >
-                  <Box flex={4} mx={1}>
-                    {usersData &&
-                      usersData.map((userData, idx) => {
-                        if (userData.id === reaction.user_id) {
-                          return (
-                            <Typography key={idx} variant="p">
-                              {userData?.name}
-                            </Typography>
-                          );
-                        }
-                      })}
-                  </Box>
-                  <Typography flex={1} variant="h6" mx={1}>
-                    {reaction.reaction}
-                  </Typography>
-                </Box>
-              ))}
+                  {props.usersData &&
+                    props.usersData.find(
+                      (u) =>
+                        u.id ===
+                        props.messages.find(
+                          (m) => m.id === props.message.parent_message_id
+                        ).sender_id
+                    )?.name}
+                  <br />"
+                  {props.messages &&
+                    props.messages.find(
+                      (m) => m.id === props.message.parent_message_id
+                    )?.message}
+                  "
+                </Button>
+              </Typography>
+            )}
+            <Typography variant="p" className="user-message">
+              {props.message.message}
+            </Typography>
+
+            {/* Message Actions */}
+
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                mt: 2,
+              }}
+              className="chat-bubble__actions"
             >
-              <Box
-                sx={{
-                  position: "absolute",
-                  right: 10,
-                  bottom: -10,
-                  fontSize: 14,
-                  bgcolor: "#bbb",
-                  padding: 1,
-                  borderRadius: 15,
+              <Button
+                className="react-button"
+                aria-describedby={id}
+                variant="text"
+                onClick={openEmojiPicker}
+                sx={{ flex: 1 }}
+              >
+                {isReacted ? (
+                  <Typography fontSize={20} fontWeight={700}>
+                    {selectedEmoji ? selectedEmoji : "❤️"}
+                  </Typography>
+                ) : (
+                  <InsertEmoticonIcon color="info" />
+                )}
+              </Button>
+              <Popover
+                id={id}
+                open={openEmoji}
+                anchorEl={anchorEl}
+                onClose={closeEmojiPicker}
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "left",
                 }}
               >
-                <PlusOne />
-                <InsertEmoticonIcon color="action" />
-              </Box>
-            </Tooltip>
-          ) : (
-            <></>
-          )}
-        </Box>
-      </Box>
-      {isReply && (
-        <Button variant="text" href={"#" + props.message.parent_message_id}>
-          <Box className="chat-bubble-reply">
-            <img
-              className="chat-bubble__left"
-              src={
-                !user.data.image_url || user.data.image_url === ""
-                  ? avatar_img
-                  : user.data.image_url
-              }
-              alt="user avatar"
-            />
-            <Box className="chat-bubble__right">
+                <Box>
+                  <Emoji onEmojiClick={handleEmojiClick} emoji="👍" />
+                  <Emoji onEmojiClick={handleEmojiClick} emoji="❤️" />
+                  <Emoji onEmojiClick={handleEmojiClick} emoji="😂" />
+                  <Emoji onEmojiClick={handleEmojiClick} emoji="😮" />
+                  <Emoji onEmojiClick={handleEmojiClick} emoji="😢" />
+                  <Emoji onEmojiClick={handleEmojiClick} emoji="🙏" />
+                </Box>
+              </Popover>
+              <ReplyPopover
+                style={{ flex: 1 }}
+                chatId={props.chatId}
+                messageId={props.message.id}
+                sendTestMsg={props.sendTestMsg}
+                scroll={props.scroll}
+              />
               <Typography
-                variant="h6"
-                fontSize={16}
-                my={1}
-                color="darkcyan"
-                className="user-name"
+                variant="body2"
+                color="grey"
+                flex={1}
+                textAlign={"center"}
               >
-                {user.data.name ? user.data.name : props.message.sender_id}
-              </Typography>
-              <Typography variant="p" className="user-message">
-                {props.message.message}
+                {getLatestMessageTime([props.message])}
               </Typography>
             </Box>
+
+            {/* Reactions */}
+
+            {props.message.reactions && props.message.reactions.length !== 0 ? (
+              <Tooltip
+                title={props.message.reactions.map((reaction, idx) => (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                    key={idx}
+                  >
+                    <Box flex={4} mx={1}>
+                      {props.usersData &&
+                        props.usersData.map((userData, idx) => {
+                          if (userData.id === reaction.user_id) {
+                            return (
+                              <Typography key={idx} variant="p">
+                                {userData?.name}
+                              </Typography>
+                            );
+                          }
+                        })}
+                    </Box>
+                    <Typography flex={1} variant="h6" mx={1}>
+                      {reaction.reaction}
+                    </Typography>
+                  </Box>
+                ))}
+              >
+                <Box
+                  sx={{
+                    position: "absolute",
+                    left: 15,
+                    bottom: -15,
+                    fontSize: 14,
+                    bgcolor: "#bbb",
+                    padding: 1,
+                    borderRadius: 15,
+                  }}
+                >
+                  <PlusOne />
+                  <InsertEmoticonIcon color="action" />
+                </Box>
+              </Tooltip>
+            ) : (
+              <></>
+            )}
           </Box>
-        </Button>
-      )}
+        </Box>
+      </Box>
     </Box>
   );
 };

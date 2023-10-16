@@ -45,6 +45,20 @@ export default function ChatList(props) {
       {props.data &&
         props?.data?.length > 0 &&
         props.data.map((d, idx) => {
+          if (
+            d.is_group &&
+            d.chat_members?.some(
+              (item) => !item.hasOwnProperty("id") && item.id === user.data.id
+            )
+          ) {
+            return <div key={idx}></div>;
+          }
+          if (
+            !d.is_group &&
+            !d.chat_name.split("-").includes(user.data.id.toString())
+          ) {
+            return <div key={idx}></div>;
+          }
           return (
             <ListItemButton
               alignItems="flex-start"

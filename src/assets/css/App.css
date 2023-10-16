@@ -170,13 +170,13 @@ input {
   border-bottom: 1px solid #7cc5d9;
 }
 
-.css-1vhaqj4-MuiButtonBase-root-MuiButton-root{
+.css-1vhaqj4-MuiButtonBase-root-MuiButton-root {
   background-color: #f07d00 !important;
   border-color: #f07d00 !important;
 }
-.MuiTypography-root{
+.MuiTypography-root {
   font-size: 1.3rem;
-  color:#666;
+  color: #666;
 }
 .css-7fhbwb {
   height: auto;
@@ -207,7 +207,6 @@ input {
 .css-7fhbwb {
   border-right: 3px solid #f07d00 !important;
   height: auto !important;
-
 }
 .send-message {
   background-color: #000;
@@ -231,7 +230,7 @@ input {
   font-size: 16px !important;
   line-height: 1.2;
 }
-.css-10hburv-MuiTypography-root{
+.css-10hburv-MuiTypography-root {
   color: #f07d00;
 }
 .css-1pqm26d-MuiAvatar-img {
@@ -275,14 +274,14 @@ input {
 .css-owf2y5-MuiButtonBase-root-MuiButton-root {
   background-color: #f07d00 !important;
 }
-.css-1oerend-MuiTypography-root{
+.css-1oerend-MuiTypography-root {
   color: #000;
 }
 .css-10ghrmp-MuiPaper-root-MuiAppBar-root {
   background-color: #000 !important;
 }
-.css-dx1msn-MuiTypography-root{
-  color:#000;
+.css-dx1msn-MuiTypography-root {
+  color: #000;
 }
 .css-12wnr2w-MuiButtonBase-root-MuiCheckbox-root.Mui-disabled {
   color: #f07d00 !important;
@@ -310,14 +309,14 @@ input {
   border: 1px solid #ccc;
   margin-top: 60px !important;
 }
-.css-11xur9t-MuiPaper-root-MuiTableContainer-root{
+.css-11xur9t-MuiPaper-root-MuiTableContainer-root {
   box-shadow: none !important;
 }
 .css-bdhsul-MuiTypography-root-MuiDialogTitle-root{
   color: #000 !important;
 }
 .css-1tnit8n-MuiContainer-root {
-  margin-top:20px;
+  margin-top: 20px;
   border: 1px solid #ccc;
   padding-bottom: 25px;
   margin-bottom: 30px;
