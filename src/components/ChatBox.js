@@ -69,7 +69,7 @@ const ChatBox = (props) => {
 
       getChatData(props.currentChat);
     }
-  }, [props.currentChat, lastJsonMessage, user.data.id]);
+  }, [props.currentChat, lastJsonMessage, user.data.id, messageAction]);
 
   const handleClickSendMessage = (msg) => {
     sendJsonMessage(msg);

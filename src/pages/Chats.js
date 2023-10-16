@@ -30,7 +30,7 @@ function Chats(props) {
   const getChat = (chatName) => {
     setCurrentChat(chatName);
     data.forEach((e) => {
-      if (e.chat_name == chatName) {
+      if (e.chat_name === chatName) {
         setSelectedChat(e);
       }
     });

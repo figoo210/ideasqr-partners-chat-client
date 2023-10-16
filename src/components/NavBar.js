@@ -20,7 +20,6 @@ import {
 } from "@mui/icons-material";
 import { FullModal } from "./Modal";
 import avatar_img from "../assets/img/user.png";
-import logoImg from "../assets/img/collaborate.png";
 import api from "../services/api";
 import { AuthContext } from "../services/AuthContext";
 import UserManagement from "./UserManagement";
@@ -117,7 +116,7 @@ const NavBar = (props) => {
             <Typography fontSize={16}>Messages</Typography>
           </ListItemText>
         </ListItemButton>
-        
+
         <ListItemButton onClick={getPageOnClick}>
           <ListItemIcon>
             <Group sx={{ color: "white" }} fontSize="medium" />
@@ -126,7 +125,7 @@ const NavBar = (props) => {
             <Typography fontSize={16}>Groups</Typography>
           </ListItemText>
         </ListItemButton>
-       
+
         <ListItemButton onClick={getPageOnClick}>
           <ListItemIcon>
             <People sx={{ color: "white" }} fontSize="medium" />
@@ -135,7 +134,7 @@ const NavBar = (props) => {
             <Typography fontSize={16}>Contact List</Typography>
           </ListItemText>
         </ListItemButton>
-        
+
         <ListItemButton onClick={handleClickToggle}>
           <ListItemIcon>
             <Settings sx={{ color: "white" }} fontSize="medium" />

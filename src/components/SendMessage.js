@@ -1,10 +1,9 @@
 import React, { useContext, useState } from "react";
-import { Box, Button } from "@mui/material";
+import { Box, Button, IconButton } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
-import api from "../services/api";
 import { AuthContext } from "../services/AuthContext";
-
 import InputEmoji from "react-input-emoji";
+import AttachmentsUpload from "./AttachmentsUpload";
 
 const SendMessage = ({ scroll, chatId, sendTestMsg }) => {
   const { user } = useContext(AuthContext);
@@ -69,6 +68,7 @@ const SendMessage = ({ scroll, chatId, sendTestMsg }) => {
           keepOpened
           onEnter={onEnter}
         />
+        {chatId && <AttachmentsUpload sendMsg={sendTestMsg} chatId={chatId} />}
       </Box>
       <Button
         disabled={isBtnDisabled}

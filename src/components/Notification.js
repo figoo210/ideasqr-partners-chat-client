@@ -1,8 +1,4 @@
 import * as React from "react";
-import Snackbar from "@mui/material/Snackbar";
-import IconButton from "@mui/material/IconButton";
-import Button from "@mui/material/Button";
-import CloseIcon from "@mui/icons-material/Close";
 
 import messageSound from "../assets/audio/alert.wav";
 import callSound from "../assets/audio/alert.wav";

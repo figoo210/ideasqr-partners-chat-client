@@ -1,7 +1,5 @@
 import React, { useContext, useState } from "react";
 
-import welcomeLogo from "../assets/img/collaborate.png";
-
 import {
   Box,
   Button,
@@ -53,7 +51,6 @@ const Welcome = () => {
             alignItems: "center",
           }}
         >
-
           <Box
             component="form"
             onSubmit={onLogin}
@@ -71,8 +68,8 @@ const Welcome = () => {
             )}
             <img src={Assets.logoPic} alt="collaborate" width={"100%"} />
             <Typography component="h1" variant="h5">
-            Sign in to chat with with your partners.
-          </Typography>
+              Sign in to chat with with your partners.
+            </Typography>
             <TextField
               margin="normal"
               required

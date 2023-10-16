@@ -13,31 +13,7 @@ import {
   Box,
 } from "@mui/material";
 import api from "../services/api";
-import { AddNewPermissionForm, AddNewRoleForm } from "./Forms";
-
-const ROLES = [
-  {
-    role: "Admin",
-    permissions: [
-      { permission: "create" },
-      { permission: "read" },
-      { permission: "update" },
-    ],
-  },
-  {
-    role: "Manager",
-    permissions: [{ permission: "create" }, { permission: "read" }],
-  },
-  // Other roles...
-];
-
-const PERMISSIONS = [
-  { permission: "create" },
-  { permission: "read" },
-  { permission: "update" },
-  { permission: "delete" },
-  // Other permissions...
-];
+import { AddNewRoleForm } from "./Forms";
 
 const RolesPermissionsManager = () => {
   const [roles, setRoles] = useState([]);
@@ -99,16 +75,18 @@ const RolesPermissionsManager = () => {
     Object.keys(editedPermissions).forEach((key) => {
       const newRP = {
         role: key,
-        permissions: editedPermissions[key]
-      }
+        permissions: editedPermissions[key],
+      };
       console.log(newRP);
-      api.newRolePermission(newRP).then((resp) => {
-        console.log(resp.data);
-        setRoles(resp.data);
-
-      }).catch((err) => {
-        console.log(err);
-      })
+      api
+        .newRolePermission(newRP)
+        .then((resp) => {
+          console.log(resp.data);
+          setRoles(resp.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     });
     setEditingRole(null);
     setEditedPermissions({});

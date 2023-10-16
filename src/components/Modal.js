@@ -29,13 +29,19 @@ export default function CustomModal(props) {
         <DialogContent>
           {/* Modal Content */}
           {props.ModalContent ? (
-            <props.ModalContent closeModal={handleClose} getAddedData={props.getAddedData} />
+            <props.ModalContent
+              closeModal={handleClose}
+              getAddedData={props.getAddedData}
+            />
           ) : (
             ""
           )}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
+          {props.actionBtn && (
+            <Button onClick={props.actionBtnAction}>{props.actionBtn}</Button>
+          )}
         </DialogActions>
       </Dialog>
     </div>

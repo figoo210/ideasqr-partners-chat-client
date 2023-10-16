@@ -12,7 +12,7 @@ export const timestampToTime = (timestampInSeconds) => {
 export const getLatestMessage = (messagesList) => {
   messagesList.sort((a, b) => a.id - b.id);
   const message = messagesList[messagesList.length - 1];
-  return message?.message;
+  return message?.message.includes("http") ? "File" : message?.message;
 };
 
 export const getLatestMessageTime = (messagesList) => {
@@ -34,6 +34,11 @@ export const removeValueFromArray = (arr, value) => {
     arr.splice(index, 1);
   }
 
+  return arr;
+};
+
+export const removeFromArrayByIndex = (arr, index) => {
+  arr.splice(index, 1);
   return arr;
 };
 

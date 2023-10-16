@@ -3,11 +3,17 @@ import { AuthContext } from "../services/AuthContext";
 import InsertEmoticonIcon from "@mui/icons-material/InsertEmoticon";
 import avatar_img from "../assets/img/user.png";
 import ReplyPopover from "./ReplyPopover";
-import { Box, Button, Link, Popover, Tooltip, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  IconButton,
+  Popover,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import { getLatestMessageTime } from "../services/helper";
-import EmojiPicker from "emoji-picker-react";
 import api from "../services/api";
-import { PlusOne } from "@mui/icons-material";
+import { FilePresentOutlined, PlusOne } from "@mui/icons-material";
 
 // Emoji component
 const Emoji = ({ emoji, onEmojiClick }) => (
@@ -65,6 +71,37 @@ const Message = (props) => {
       setIsReply(true);
     } else setIsReply(false);
   }, []);
+
+  const displayMessage = (msg) => {
+    if (msg.includes("https://") || msg.includes("http://")) {
+      if (
+        msg.includes(".png") ||
+        msg.includes(".jpeg") ||
+        msg.includes(".jpg")
+      ) {
+        return <img width={300} src={msg} />;
+      } else {
+        return (
+          <IconButton
+            onClick={() => {
+              // Create a temporary link element
+              const link = document.createElement("a");
+              link.href = msg;
+
+              // Simulate a click to trigger the download
+              link.click();
+            }}
+            aria-label="Download"
+          >
+            <FilePresentOutlined sx={{ fontSize: 40 }} />
+            {msg.substring(msg.lastIndexOf("%2F") + 3, msg.lastIndexOf("?"))}
+          </IconButton>
+        );
+      }
+    } else {
+      return msg;
+    }
+  };
 
   if (!props.message) return;
 
@@ -143,7 +180,7 @@ const Message = (props) => {
               </Typography>
             )}
             <Typography variant="p" className="user-message">
-              {props.message.message}
+              {displayMessage(props.message.message)}
             </Typography>
 
             {/* Message Actions */}
