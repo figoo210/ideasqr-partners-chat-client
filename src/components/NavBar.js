@@ -85,7 +85,7 @@ const NavBar = (props) => {
         }
         alt="User Avatar"
         width={150}
-        style={{ marginTop: 50 }}
+        style={{ marginTop: 20 }}
       />
       <Typography variant="h6" mb={1} mt={1}>
         {user.data.name} {user.data.image_url}
@@ -117,7 +117,7 @@ const NavBar = (props) => {
             <Typography fontSize={18}>Messages</Typography>
           </ListItemText>
         </ListItemButton>
-        <br />
+        
         <ListItemButton onClick={getPageOnClick}>
           <ListItemIcon>
             <Group sx={{ color: "white" }} fontSize="medium" />
@@ -126,7 +126,7 @@ const NavBar = (props) => {
             <Typography fontSize={18}>Groups</Typography>
           </ListItemText>
         </ListItemButton>
-        <br />
+       
         <ListItemButton onClick={getPageOnClick}>
           <ListItemIcon>
             <People sx={{ color: "white" }} fontSize="medium" />
@@ -135,7 +135,7 @@ const NavBar = (props) => {
             <Typography fontSize={18}>Contact List</Typography>
           </ListItemText>
         </ListItemButton>
-        <br />
+        
         <ListItemButton onClick={handleClickToggle}>
           <ListItemIcon>
             <Settings sx={{ color: "white" }} fontSize="medium" />
@@ -211,7 +211,7 @@ const NavBar = (props) => {
         </Collapse>
       </List>
 
-      <Box position={"absolute"} bottom={15}>
+      {/* <Box position={"absolute"} bottom={15}>
         <img
           src={logoImg}
           alt="collaborate"
@@ -221,7 +221,7 @@ const NavBar = (props) => {
         <Typography variant="h6" fontWeight={700}>
           Partners Chat
         </Typography>
-      </Box>
+      </Box> */}
     </Box>
   );
 };

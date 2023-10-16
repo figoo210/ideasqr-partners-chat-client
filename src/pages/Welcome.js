@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { AuthContext } from "../services/AuthContext";
 import Notification from "../components/Notification";
+import Assets from "../assets/data";
 
 const Welcome = () => {
   const [email, setEmail] = useState("");
@@ -41,9 +42,7 @@ const Welcome = () => {
   return (
     <main className="welcome">
       <h1>Welcome to Partners Chat.</h1>
-      <br />
-      <br />
-      <img src={welcomeLogo} alt="collaborate" width={100} />
+
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Box
@@ -54,14 +53,12 @@ const Welcome = () => {
             alignItems: "center",
           }}
         >
-          <Typography component="h1" variant="h5">
-            Sign in to chat with with your partners.
-          </Typography>
+
           <Box
             component="form"
             onSubmit={onLogin}
             noValidate
-            sx={{ mt: 2, padding: 3, borderRadius: 5 }}
+            sx={{ padding: 3 }}
             bgcolor={"white"}
           >
             {isError && (
@@ -72,6 +69,10 @@ const Welcome = () => {
                 msg={error}
               />
             )}
+            <img src={Assets.logoPic} alt="collaborate" width={"100%"} />
+            <Typography component="h1" variant="h5">
+            Sign in to chat with with your partners.
+          </Typography>
             <TextField
               margin="normal"
               required

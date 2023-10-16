@@ -11,6 +11,7 @@ body {
   max-width: 100vw;
   font-size: 16px;
   font-family: sans-serif;
+  background: #f0f1f5;
 }
 
 button,
@@ -20,8 +21,8 @@ input {
 
 .App {
   width: 100%;
-  min-height: 100vh;
-  background-color: #1c2c4c;
+  min-height: auto;
+  background-color: #f0f1f5;
   color: #4c768d;
   /* padding-top: 60px; */
 }
@@ -62,8 +63,8 @@ input {
 .welcome {
   padding: 30px;
   text-align: center;
-  /* margin-top: 40px; */
-  color: #7cc5d9;
+  color: #000;
+  background: #f0f1f5;
 }
 .welcome :is(h2, p, img) {
   margin-bottom: 20px;
@@ -167,4 +168,159 @@ input {
 .send-message > :is(input):focus {
   outline: none;
   border-bottom: 1px solid #7cc5d9;
+}
+
+.css-1vhaqj4-MuiButtonBase-root-MuiButton-root{
+  background-color: #f07d00 !important;
+  border-color: #f07d00 !important;
+}
+.MuiTypography-root{
+  font-size: 1.3rem;
+  color:#666;
+}
+.css-7fhbwb {
+  height: auto;
+  border-right: 3px solid;
+  padding: 10px 0;
+  text-align: center;
+  width: 18%;
+  background: #000;
+}
+.css-zdq2ql {
+  height: 100vh;
+  border-right: 3px solid;
+  width: 23%;
+  background-color: #f0f1f5 !important;
+}
+.css-1bl46n2 {
+  height: 100vh;
+  width: 60%;
+  background-color: #f0f1f5 !important;
+}
+.css-4kzcbc-MuiButtonBase-root-MuiButton-root {
+  border: 1px solid #f07d00 !important;
+  color: #f07d00 !important;
+}
+.MuiTypography-root {
+  color: #fff;
+}
+.css-7fhbwb {
+  border-right: 3px solid #f07d00 !important;
+  height: auto !important;
+
+}
+.send-message {
+  background-color: #000;
+}
+.css-jguzw {
+  background-color: #000 !important;
+}
+.css-zdq2ql {
+  border-right: 3px solid #f07d00 !important;
+}
+.css-1d159sf-MuiSvgIcon-root {
+  color: #f07d00 !important;
+}
+.css-knapww-MuiTypography-root{
+  color:#000;
+}
+.css-qscxtw-MuiTypography-root {
+  font-size: 17px !important;
+}
+.css-10hburv-MuiTypography-root{
+  color: #f07d00;
+}
+.css-1pqm26d-MuiAvatar-img {
+  border: 1px solid #f07d00;
+  border-radius: 50%;
+}
+.css-1iw7z4m-MuiTypography-root{
+  color:#000;
+}
+.messages-wrapper {
+  background: #f0f1f5;
+}
+.chat-bubble {
+  padding: 15px;
+  background-color: #eee;
+  color: #000;
+  box-shadow: -2px 2px 1px 1px #ccc;
+}
+.css-37jdci-MuiTypography-root {
+  margin: 0;
+  color: #000;
+}
+.css-1e6y48t-MuiButtonBase-root-MuiButton-root {
+  color: #f07d00 !important;
+}
+.css-1yq1soz-MuiSvgIcon-root {
+  color: #f07d00 !important;
+}
+.css-6z3701-MuiTypography-root {
+  color: #444 !important;
+}
+.chat-bubble.right {
+  box-shadow: -2px 2px 1px 1px #f07d00 !important;
+}
+.css-1pc74rv-MuiButtonBase-root-MuiButton-root.Mui-disabled {
+  color: #fff;
+  background-color: #f07d00;
+}
+.css-owf2y5-MuiButtonBase-root-MuiButton-root {
+  background-color: #f07d00 !important;
+}
+.css-1oerend-MuiTypography-root{
+  color: #000;
+}
+.css-10ghrmp-MuiPaper-root-MuiAppBar-root {
+  background-color: #000 !important;
+}
+.css-dx1msn-MuiTypography-root{
+  color:#000;
+}
+.css-12wnr2w-MuiButtonBase-root-MuiCheckbox-root.Mui-disabled {
+  color: #f07d00 !important;
+}
+.css-g1n4t7-MuiButtonBase-root-MuiButton-root {
+  background-color: #f07d00 !important;
+}
+.css-hpx4uu-MuiButtonBase-root-MuiButton-root {
+  border: 1px solid #f07d00 !important;
+  color: #f07d00 !important;
+}
+.css-dv72vw {
+  background-color: #eee !important;
+}
+.css-1r3hetr-MuiButtonBase-root-MuiButton-root {
+  background-color: #f07d00 !important;
+}
+.css-15wwp11-MuiTableHead-root tr th{
+  background-color: #000;
+  color:#fff;
+}
+.css-rqglhn-MuiTable-root {
+  width: 90% !important;
+  margin: 0 auto !important;
+  border: 1px solid #ccc;
+  margin-top: 60px !important;
+}
+.css-11xur9t-MuiPaper-root-MuiTableContainer-root{
+  box-shadow: none !important;
+}
+.css-bdhsul-MuiTypography-root-MuiDialogTitle-root{
+  color: #000;
+}
+.css-1tnit8n-MuiContainer-root {
+  margin-top:20px;
+  border: 1px solid #ccc;
+  padding-bottom: 25px;
+  margin-bottom: 30px;
+  padding-top: 25px;
+}
+.css-15c2ieu-MuiButtonBase-root-MuiButton-root {
+  padding: 16px 16px !important;
+  color: #fff;
+  background-color: #1976d2;
+  box-shadow: none;
+  width: 100%;
 }

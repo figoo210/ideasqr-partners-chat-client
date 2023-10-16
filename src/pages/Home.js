@@ -12,11 +12,11 @@ function Home() {
   };
 
   return (
-    <Box sx={{ display: "flex", width: "100%" }}>
+    <Box sx={{ display: "flex", width: "auto%" }}>
       <Box
         height={"100vh"}
         borderRight={3}
-        sx={{ padding: "10px 0", textAlign: "center", width: "17%" }}
+        sx={{ padding: "10px 0", textAlign: "center", width: "18%" }}
       >
         <NavBar getPage={getPage} />
       </Box>
@@ -26,7 +26,7 @@ function Home() {
         </>
       ) : (
         <>
-          <Box height={"100vh"} sx={{ width: "83%", backgroundColor: "#ccc" }}>
+          <Box height={"auto"} sx={{ width: "82%", backgroundColor: "#f0f1f5" }}>
             <Start />
           </Box>
         </>
