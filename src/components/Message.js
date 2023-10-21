@@ -70,6 +70,7 @@ const Message = (props) => {
     ) {
       setIsReply(true);
     } else setIsReply(false);
+
   }, []);
 
   const displayMessage = (msg) => {
@@ -144,45 +145,49 @@ const Message = (props) => {
                   ?.name}
             </Typography>
             {isReply && (
-              <Typography variant="h6">
-                <Button
-                  sx={{
-                    borderRadius: "0",
-                    backgroundColor: "transparent",
-                    color: "grey",
-                    "&:hover": {
+              <Box className="chat-bubble-reply">
+                <Typography variant="p" >
+                  <Button
+                    sx={{
+                      position: "relative",
+                      borderRadius: "0",
+                      fontSize: 12,
                       backgroundColor: "transparent",
-                    },
-                    "&:active": {
-                      backgroundColor: "transparent",
-                    },
-                    "&:focus": {
-                      boxShadow: "none",
-                    },
-                  }}
-                  href={"#" + props.message.parent_message_id}
-                >
-                  {props.usersData &&
-                    props.usersData.find(
-                      (u) =>
-                        u.id ===
+                      color: "grey",
+                      "&:hover": {
+                        backgroundColor: "transparent",
+                      },
+                      "&:active": {
+                        backgroundColor: "transparent",
+                      },
+                      "&:focus": {
+                        boxShadow: "none",
+                      },
+                    }}
+                    href={"#" + props?.message.parent_message_id}
+                  >
+                    {props.usersData && props.messages &&
+                      props.usersData.find(
+                        (u) =>
+                          u.id ===
+                          props.messages.find(
+                            (m) => m.id === props.message.parent_message_id
+                          )?.sender_id
+                      )?.name}
+                    <br />"
+                    {props.messages &&
+                      displayMessage(
                         props.messages.find(
                           (m) => m.id === props.message.parent_message_id
-                        ).sender_id
-                    )?.name}
-                  <br />"
-                  {props.messages &&
-                    displayMessage(
-                      props.messages.find(
-                        (m) => m.id === props.message.parent_message_id
-                      )?.message
-                    )}
-                  "
-                </Button>
-              </Typography>
+                        )?.message || ""
+                      )}
+                    "
+                  </Button>
+                </Typography>
+              </Box>
             )}
             <Typography variant="p" className="user-message">
-              {displayMessage(props.message.message)}
+              {displayMessage(props.message.message || "")}
             </Typography>
 
             {/* Message Actions */}

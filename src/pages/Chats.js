@@ -15,6 +15,7 @@ function Chats(props) {
 
   const [currentChat, setCurrentChat] = useState(null);
   const [selectedChat, setSelectedChat] = useState(null);
+  const [updateChats, setUpdateChats] = useState(null);
 
   const [usersModalOpen, setUsersModalOpen] = useState(false);
   const [addGroupOpen, setAddGroupOpen] = useState(false);
@@ -82,7 +83,7 @@ function Chats(props) {
     };
 
     getData();
-  }, [props.page]);
+  }, [props.page, updateChats]);
   return (
     <>
       <Box
@@ -162,10 +163,10 @@ function Chats(props) {
             color="primary"
           />
           {props.page !== "Contact List" && (
-            <ChatList getChat={getChat} data={data} usersData={usersData} />
+            <ChatList getChat={getChat} data={data} usersData={usersData} updateChats={setUpdateChats} />
           )}
           {props.page === "Contact List" && (
-            <UsersList getChat={getChat} data={data} />
+            <UsersList getChat={getChat} data={data} updateChats={setUpdateChats} />
           )}
         </Box>
       </Box>

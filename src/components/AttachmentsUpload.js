@@ -49,14 +49,13 @@ function AttachmentsUpload(props) {
   };
 
   const handleUpload = (event) => {
+    setUploading(true);
     const previewFiles = [];
     const urls = [];
     const storages = [];
     const files = event.target.files;
     for (let i = 0; i < files.length; i++) {
       let file = files[i];
-      setUploading(true);
-      setUploaded(false);
       const storageRef = ref(storage, `chat_files/${file.name}`);
       storages.push(storageRef);
 
@@ -65,6 +64,7 @@ function AttachmentsUpload(props) {
         "state_changed",
         (snapshot) => {
           setUploading(true);
+
         },
         (error) => {
           // Handle unsuccessful uploads
@@ -77,6 +77,7 @@ function AttachmentsUpload(props) {
             setStorageState(storages);
             setFilesPreview(previewFiles);
             setUploadedFilesUrls(urls);
+
             setUploading(false);
             setUploaded(true);
           });
@@ -186,6 +187,9 @@ function AttachmentsUpload(props) {
       props.sendMsg(addMessage);
     });
     setAttachOpen(false);
+    setStorageState([]);
+    setFilesPreview([]);
+    setUploaded(false);
   };
 
   return (
@@ -208,6 +212,7 @@ function AttachmentsUpload(props) {
         getAddedData={getAddedData}
         actionBtn="Send"
         actionBtnAction={sendAttachmentMessage}
+        actionBtnDisabled={!uploaded}
       />
     </div>
   );

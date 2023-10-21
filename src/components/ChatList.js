@@ -7,11 +7,14 @@ import Typography from "@mui/material/Typography";
 import Assets from "../assets/data";
 import {
   getLatestMessage,
+  getLatestMessageNotification,
   getLatestMessageTime,
   getOtherChatUserId,
 } from "../services/helper";
 import { Box, ListItemButton } from "@mui/material";
 import { AuthContext } from "../services/AuthContext";
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
+import api from "../services/api";
 
 export default function ChatList(props) {
   const { user } = React.useContext(AuthContext);
@@ -31,6 +34,18 @@ export default function ChatList(props) {
 
   const getClicked = (e) => {
     props.getChat(e.currentTarget.id);
+    props.updateChats(Math.random());
+    for (let i = 0; i < props?.data.length; i++) {
+      const element = props?.data[i];
+      if (element.chat_name === e.currentTarget.id) {
+        for (let j = 0; j < element.messages.length; j++) {
+          const msg = element.messages[j];
+          if (!msg.seen){
+            api.messageSeen(msg.id);
+          }
+        }
+      }
+    }
   };
 
   return (
@@ -54,8 +69,8 @@ export default function ChatList(props) {
             return <div key={idx}></div>;
           }
           if (
-            !d.is_group &&
-            !d.chat_name.split("-").includes(user.data.id.toString())
+            !d.is_group && d?.chat_name &&
+            !d?.chat_name.split("-").includes(user.data.id.toString())
           ) {
             return <div key={idx}></div>;
           }
@@ -87,7 +102,7 @@ export default function ChatList(props) {
                   alignItems: "center",
                 }}
               >
-                {/* <PlusOneRounded sx={{ color: "white", backgroundColor: "green" }} /> */}
+                {d?.messages && getLatestMessageNotification(d.messages, user.data.id) && <NotificationsActiveIcon sx={{ color: "white", backgroundColor: "green" }} />}
                 <Typography
                   variant="body2"
                   color={"grey"}

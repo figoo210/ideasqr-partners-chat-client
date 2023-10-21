@@ -40,7 +40,7 @@ export default function CustomModal(props) {
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
           {props.actionBtn && (
-            <Button onClick={props.actionBtnAction}>{props.actionBtn}</Button>
+            <Button onClick={props.actionBtnAction} disabled={props.actionBtnDisabled}>{props.actionBtn}</Button>
           )}
         </DialogActions>
       </Dialog>

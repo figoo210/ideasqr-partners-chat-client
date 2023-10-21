@@ -95,14 +95,9 @@ input {
 }
 .chat-bubble-reply {
   position: relative;
-  border-radius: 20px;
-  padding: 15px;
-  background-color: #bbb;
-  color: #1c2c4c;
   width: max-content;
   min-width: 200px;
-  max-width: calc(100% - 50px);
-  box-shadow: -2px 2px 1px 1px #4c768d;
+  max-width: 600px;
   display: flex;
   align-items: flex-start;
   height: max-content;

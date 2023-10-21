@@ -15,17 +15,49 @@ export const getLatestMessage = (messagesList) => {
   return message?.message.includes("http") ? "File" : message?.message;
 };
 
+export const getLatestMessageNotification = (messagesList, currentUserId) => {
+  messagesList.sort((a, b) => a.id - b.id);
+  const message = messagesList[messagesList.length - 1];
+  if (message?.sender_id === currentUserId) {
+    return false;
+  }
+  return message?.seen ? false : true;
+};
+
+// export const getLatestMessageTime = (messagesList) => {
+//   messagesList.sort((a, b) => a.id - b.id);
+//   const message = messagesList[messagesList.length - 1];
+//   return (
+//     `${message?.created_at ? message?.created_at.split("T")[1] : "-"}`
+//       .split(":")
+//       .slice(0, -1)
+//       .join(":") +
+//     `\n${message?.created_at ? message?.created_at.split("T")[0] : "-"}`
+//   );
+// };
+
 export const getLatestMessageTime = (messagesList) => {
   messagesList.sort((a, b) => a.id - b.id);
   const message = messagesList[messagesList.length - 1];
-  return (
-    `${message?.created_at ? message?.created_at.split("T")[1] : "-"}`
-      .split(":")
-      .slice(0, -1)
-      .join(":") +
-    `\n${message?.created_at ? message?.created_at.split("T")[0] : "-"}`
-  );
+
+  if (!message?.created_at) {
+    return "-";
+  }
+
+  const localTime = new Date(message.created_at).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  const localDate = new Date(message.created_at).toLocaleDateString([], {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+
+  return `${localTime}\n${localDate}`;
 };
+
 
 export const removeValueFromArray = (arr, value) => {
   const index = arr.indexOf(value);

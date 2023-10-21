@@ -5,7 +5,7 @@ import api from "../services/api";
 import { AuthContext } from "../services/AuthContext";
 import { Box, Popper, Typography } from "@mui/material";
 import { getOtherChatUserId } from "../services/helper";
-import useWebSocket from "react-use-websocket";
+import useWebSocket, { ReadyState } from "react-use-websocket";
 
 const ChatBox = (props) => {
   const { user } = useContext(AuthContext);
@@ -28,25 +28,41 @@ const ChatBox = (props) => {
   const [socketUrl, setSocketUrl] = useState(
     process.env.REACT_APP_WEBSOCKET_URL
   );
-  const { sendJsonMessage, lastJsonMessage } = useWebSocket(socketUrl);
+  const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(socketUrl);
   const [messageAction, setMessageAction] = useState(null);
 
+  const connectionStatus = {
+    [ReadyState.CONNECTING]: 'Connecting',
+    [ReadyState.OPEN]: 'Open',
+    [ReadyState.CLOSING]: 'Closing',
+    [ReadyState.CLOSED]: 'Closed',
+    [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
+  }[readyState];
+
   useEffect(() => {
-    if (props.selectedChat) {
-      let chat = props.selectedChat;
-      if (!chat.is_group && props.usersData) {
-        setMembers([]);
-        props.usersData.forEach((u) => {
-          if (getOtherChatUserId(chat.chat_name, user.data.id) === u.id) {
-            setChatDisplayName(u.name);
-          }
-        });
-      } else {
-        setChatDisplayName(chat.chat_name);
-        setMembers(chat.chat_members);
-      }
-      setMessages(chat.messages);
+
+    // Check web socket status
+    console.log(connectionStatus);
+    if (connectionStatus === "Closing" || connectionStatus === "Closed") {
+      window.location.reload();
     }
+
+    // props.updateChats(Math.random());
+    // if (props.selectedChat) {
+    //   let chat = props.selectedChat;
+    //   if (!chat.is_group && props.usersData) {
+    //     setMembers([]);
+    //     props.usersData.forEach((u) => {
+    //       if (getOtherChatUserId(chat.chat_name, user.data.id) === u.id) {
+    //         setChatDisplayName(u.name);
+    //       }
+    //     });
+    //   } else {
+    //     setChatDisplayName(chat.chat_name);
+    //     setMembers(chat.chat_members);
+    //   }
+    //   setMessages(chat.messages);
+    // }
 
     // get chat room if exist and create one if not exist
     if (props.currentChat) {
@@ -69,7 +85,7 @@ const ChatBox = (props) => {
 
       getChatData(props.currentChat);
     }
-  }, [props.currentChat, lastJsonMessage, user.data.id, messageAction]);
+  }, [props.currentChat, lastJsonMessage, user.data.id, messageAction, connectionStatus]);
 
   const handleClickSendMessage = (msg) => {
     sendJsonMessage(msg);

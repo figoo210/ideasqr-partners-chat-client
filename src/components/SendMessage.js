@@ -67,6 +67,7 @@ const SendMessage = ({ scroll, chatId, sendTestMsg }) => {
           name="messageInput"
           keepOpened
           onEnter={onEnter}
+          maxLength={5000}
         />
         {chatId && <AttachmentsUpload sendMsg={sendTestMsg} chatId={chatId} />}
       </Box>

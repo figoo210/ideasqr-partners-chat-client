@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Box } from "@mui/material";
 import NavBar from "../components/NavBar";
-import Start from "./Start";
+import Loading from "./Loading";
 import Chats from "./Chats";
 
 function Home() {
@@ -27,7 +27,7 @@ function Home() {
       ) : (
         <>
           <Box height={"auto"} sx={{ width: "82%", backgroundColor: "#f0f1f5" }}>
-            <Start />
+            <Loading />
           </Box>
         </>
       )}

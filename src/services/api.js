@@ -122,6 +122,10 @@ export default {
     return Api.post("/messages/", message);
   },
 
+  messageSeen: (id) => {
+    return Api.get(`/messages/${id}`);
+  },
+
   // Reactions
   reactOnMessage: (reaction) => {
     return Api.post("/message_reactions/", reaction);
