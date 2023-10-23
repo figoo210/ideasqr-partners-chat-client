@@ -5,6 +5,13 @@ import logoJPG from "./img/l.jpeg";
 import favIcon from "./img/fav.jpeg";
 import iconImg from "./img/letter-p(2).png";
 
+import phoneCall from "./gif/phone.gif";
+import videoCall from "./gif/video-call.gif";
+import videoConference from "./gif/video-conference.gif";
+import groupConference from "./gif/video-conference(1).gif";
+
+import alertSound from "./audio/alert.wav";
+
 const Assets = {
   logo: logoImg,
   logoPic: logoPic,
@@ -12,6 +19,14 @@ const Assets = {
   avatar: userImg,
   logoJPG: logoJPG,
   favIcon: favIcon,
+  //GIF
+  phoneCall: phoneCall,
+  videoCall: videoCall,
+  videoConference: videoConference,
+  groupConference: groupConference,
+
+  // Audio
+  alertSound: alertSound,
 };
 
 export default Assets;

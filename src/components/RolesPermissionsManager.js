@@ -14,8 +14,11 @@ import {
 } from "@mui/material";
 import api from "../services/api";
 import { AddNewRoleForm } from "./Forms";
+import { AuthContext } from "../services/AuthContext";
 
 const RolesPermissionsManager = () => {
+  const { user } = React.useContext(AuthContext);
+
   const [roles, setRoles] = useState([]);
   const [permissions, setPermissions] = useState([]);
 
@@ -71,13 +74,11 @@ const RolesPermissionsManager = () => {
 
   const handleSaveClick = () => {
     // Send editedPermissions to the server or update state as desired
-    console.log(editedPermissions);
     Object.keys(editedPermissions).forEach((key) => {
       const newRP = {
         role: key,
         permissions: editedPermissions[key],
       };
-      console.log(newRP);
       api
         .newRolePermission(newRP)
         .then((resp) => {

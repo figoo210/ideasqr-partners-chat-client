@@ -13,7 +13,7 @@ import {
 } from "../services/helper";
 import { Box, ListItemButton } from "@mui/material";
 import { AuthContext } from "../services/AuthContext";
-import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
+import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import api from "../services/api";
 
 export default function ChatList(props) {
@@ -34,18 +34,18 @@ export default function ChatList(props) {
 
   const getClicked = (e) => {
     props.getChat(e.currentTarget.id);
-    props.updateChats(Math.random());
     for (let i = 0; i < props?.data.length; i++) {
       const element = props?.data[i];
       if (element.chat_name === e.currentTarget.id) {
         for (let j = 0; j < element.messages.length; j++) {
           const msg = element.messages[j];
-          if (!msg.seen){
+          if (!msg.seen && user.data.id !== msg.sender_id) {
             api.messageSeen(msg.id);
           }
         }
       }
     }
+    props.updateChats(Math.random());
   };
 
   return (
@@ -62,14 +62,13 @@ export default function ChatList(props) {
         props.data.map((d, idx) => {
           if (
             d.is_group &&
-            d.chat_members?.some(
-              (item) => !item.hasOwnProperty("id") && item.id === user.data.id
-            )
+            !d.chat_members?.some((item) => item.user_id === user.data.id)
           ) {
             return <div key={idx}></div>;
           }
           if (
-            !d.is_group && d?.chat_name &&
+            !d.is_group &&
+            d?.chat_name &&
             !d?.chat_name.split("-").includes(user.data.id.toString())
           ) {
             return <div key={idx}></div>;
@@ -102,7 +101,12 @@ export default function ChatList(props) {
                   alignItems: "center",
                 }}
               >
-                {d?.messages && getLatestMessageNotification(d.messages, user.data.id) && <NotificationsActiveIcon sx={{ color: "white", backgroundColor: "green" }} />}
+                {d?.messages &&
+                  getLatestMessageNotification(d.messages, user.data.id) && (
+                    <NotificationsActiveIcon
+                      sx={{ color: "white", backgroundColor: "green" }}
+                    />
+                  )}
                 <Typography
                   variant="body2"
                   color={"grey"}

@@ -3,9 +3,10 @@ import Message from "./Message";
 import SendMessage from "./SendMessage";
 import api from "../services/api";
 import { AuthContext } from "../services/AuthContext";
-import { Box, Popper, Typography } from "@mui/material";
-import { getOtherChatUserId } from "../services/helper";
+import { Box, Button, IconButton, Popper, Typography } from "@mui/material";
+import { getOtherChatUserId, generateRandomString } from "../services/helper";
 import useWebSocket, { ReadyState } from "react-use-websocket";
+import { VideoCallOutlined } from "@mui/icons-material";
 
 const ChatBox = (props) => {
   const { user } = useContext(AuthContext);
@@ -28,67 +29,120 @@ const ChatBox = (props) => {
   const [socketUrl, setSocketUrl] = useState(
     process.env.REACT_APP_WEBSOCKET_URL
   );
-  const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(socketUrl);
-  const [messageAction, setMessageAction] = useState(null);
+  const { sendJsonMessage, lastJsonMessage, readyState } =
+    useWebSocket(socketUrl);
 
   const connectionStatus = {
-    [ReadyState.CONNECTING]: 'Connecting',
-    [ReadyState.OPEN]: 'Open',
-    [ReadyState.CLOSING]: 'Closing',
-    [ReadyState.CLOSED]: 'Closed',
-    [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
+    [ReadyState.CONNECTING]: "Connecting",
+    [ReadyState.OPEN]: "Open",
+    [ReadyState.CLOSING]: "Closing",
+    [ReadyState.CLOSED]: "Closed",
+    [ReadyState.UNINSTANTIATED]: "Uninstantiated",
   }[readyState];
 
-  useEffect(() => {
+  const newChat = (chatId) => {
+    api.getChatOrCreate(chatId).then((chat) => {
+      if (!chat.is_group && props.usersData) {
+        setMembers([]);
+        props.usersData.forEach((u) => {
+          if (getOtherChatUserId(chat.chat_name, user.data.id) === u.id) {
+            setChatDisplayName(u.name);
+          }
+        });
+      } else {
+        setChatDisplayName(chat.chat_name);
+        setMembers(chat.chat_members);
+      }
+      setMessages(chat.messages);
+    });
+  };
 
+  const getSelectedChat = (chatName) => {
+    let chat = null;
+    setMessages([]);
+    props.data.forEach((c) => {
+      if (c.chat_name === chatName) {
+        chat = c;
+      }
+    });
+    if (chat) {
+      if (!chat.is_group && props.usersData) {
+        setMembers([]);
+        props.usersData.forEach((u) => {
+          if (getOtherChatUserId(chat.chat_name, user.data.id) === u.id) {
+            setChatDisplayName(u.name);
+          }
+        });
+      } else {
+        setChatDisplayName(chat.chat_name);
+        setMembers(chat.chat_members);
+      }
+      setMessages(chat.messages);
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  const getUpdatedChat = (chatId) => {
+    api
+      .chatMessages(chatId)
+      .then((response) => {
+        setMessages(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  useEffect(() => {
     // Check web socket status
     console.log(connectionStatus);
     if (connectionStatus === "Closing" || connectionStatus === "Closed") {
       window.location.reload();
     }
 
-    // props.updateChats(Math.random());
-    // if (props.selectedChat) {
-    //   let chat = props.selectedChat;
-    //   if (!chat.is_group && props.usersData) {
-    //     setMembers([]);
-    //     props.usersData.forEach((u) => {
-    //       if (getOtherChatUserId(chat.chat_name, user.data.id) === u.id) {
-    //         setChatDisplayName(u.name);
-    //       }
-    //     });
-    //   } else {
-    //     setChatDisplayName(chat.chat_name);
-    //     setMembers(chat.chat_members);
-    //   }
-    //   setMessages(chat.messages);
+    // if (messageAction !== oldAction) {
+    //   console.log("Action Here");
     // }
 
     // get chat room if exist and create one if not exist
     if (props.currentChat) {
-      const getChatData = (chatId) => {
-        api.getChatOrCreate(chatId).then((chat) => {
-          if (!chat.is_group && props.usersData) {
-            setMembers([]);
-            props.usersData.forEach((u) => {
-              if (getOtherChatUserId(chat.chat_name, user.data.id) === u.id) {
-                setChatDisplayName(u.name);
-              }
-            });
-          } else {
-            setChatDisplayName(chat.chat_name);
-            setMembers(chat.chat_members);
-          }
-          setMessages(chat.messages);
-        });
-      };
-
-      getChatData(props.currentChat);
+      if (!getSelectedChat(props.currentChat)) {
+        newChat(props.currentChat);
+      }
     }
-  }, [props.currentChat, lastJsonMessage, user.data.id, messageAction, connectionStatus]);
+
+    if (lastJsonMessage && props.currentChat) {
+      props.updateChats(Math.random());
+      getUpdatedChat(props.currentChat);
+    }
+  }, [props.currentChat, lastJsonMessage, user.data.id, connectionStatus]);
 
   const handleClickSendMessage = (msg) => {
     sendJsonMessage(msg);
+  };
+
+  const makeCall = () => {
+    let chat = null;
+    const listOfUsers = [];
+    props.data.forEach((c) => {
+      if (c.chat_name === props.currentChat) {
+        chat = c;
+      }
+    });
+    if (chat && props.usersData) {
+      if (!chat.is_group) {
+        listOfUsers.push(getOtherChatUserId(chat.chat_name, user.data.id));
+      } else {
+        if (members.length > 0) {
+          listOfUsers = members
+            .filter((u) => u.id !== user.data.id)
+            .map((u) => u.id);
+        }
+      }
+      props.makeCallWith(user.data, listOfUsers, generateRandomString(10));
+    }
   };
 
   return (
@@ -150,6 +204,24 @@ const ChatBox = (props) => {
               </>
             )}
           </Typography>
+          <Button
+            sx={{
+              bgcolor: "black",
+              padding: 1,
+              position: "absolute",
+              right: 10,
+              top: 0,
+              bottom: 0,
+              margin: "auto",
+              "&:hover": {
+                backgroundColor: "black",
+              },
+              height: "70%",
+            }}
+            onClick={makeCall}
+          >
+            <VideoCallOutlined sx={{ color: "#f07d00", fontSize: 35 }} />
+          </Button>
         </Box>
       )}
       <div className="messages-wrapper">
@@ -160,7 +232,6 @@ const ChatBox = (props) => {
             message={message}
             chatId={props.currentChat}
             sendTestMsg={handleClickSendMessage}
-            getMessageAction={setMessageAction}
             usersData={props.usersData}
             messages={messages}
           />

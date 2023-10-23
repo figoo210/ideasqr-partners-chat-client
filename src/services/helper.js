@@ -16,6 +16,9 @@ export const getLatestMessage = (messagesList) => {
 };
 
 export const getLatestMessageNotification = (messagesList, currentUserId) => {
+  if (messagesList.length === 0) {
+    return false;
+  }
   messagesList.sort((a, b) => a.id - b.id);
   const message = messagesList[messagesList.length - 1];
   if (message?.sender_id === currentUserId) {
@@ -58,7 +61,6 @@ export const getLatestMessageTime = (messagesList) => {
   return `${localTime}\n${localDate}`;
 };
 
-
 export const removeValueFromArray = (arr, value) => {
   const index = arr.indexOf(value);
 
@@ -79,4 +81,17 @@ export const getOtherChatUserId = (chatName, currentUserId) => {
   chatNameArr = removeValueFromArray(chatNameArr, "chat");
   chatNameArr = removeValueFromArray(chatNameArr, currentUserId.toString());
   return parseInt(chatNameArr[0]);
+};
+
+export const generateRandomString = (length) => {
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let result = "";
+
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    result += characters.charAt(randomIndex);
+  }
+
+  return result;
 };

@@ -40,7 +40,12 @@ export default function CustomModal(props) {
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
           {props.actionBtn && (
-            <Button onClick={props.actionBtnAction} disabled={props.actionBtnDisabled}>{props.actionBtn}</Button>
+            <Button
+              onClick={props.actionBtnAction}
+              disabled={props.actionBtnDisabled}
+            >
+              {props.actionBtn}
+            </Button>
           )}
         </DialogActions>
       </Dialog>
@@ -78,6 +83,41 @@ export const FullModal = (props) => {
           </Toolbar>
         </AppBar>
         {props.ModalContent ? <props.ModalContent /> : ""}
+      </Dialog>
+    </div>
+  );
+};
+
+export const FullReadyModal = (props) => {
+  const handleClose = () => {
+    props.updateOpenValue(false);
+  };
+
+  return (
+    <div>
+      <Dialog
+        fullScreen
+        open={props.open}
+        onClose={handleClose}
+        TransitionComponent={Transition}
+      >
+        <AppBar sx={{ position: "relative" }}>
+          <Toolbar>
+            <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
+              {props.modalTitle}
+            </Typography>
+
+            <IconButton
+              edge="start"
+              color="inherit"
+              onClick={handleClose}
+              aria-label="close"
+            >
+              <CloseIcon />
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+        {props.ModalContent ? props.ModalContent : ""}
       </Dialog>
     </div>
   );

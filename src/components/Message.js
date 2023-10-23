@@ -52,7 +52,7 @@ const Message = (props) => {
         console.log("reaction added");
         setSelectedEmoji(emoji);
         setIsReacted(true);
-        props.getMessageAction(Math.random());
+        props.sendTestMsg("reaction");
         closeEmojiPicker();
       })
       .catch((e) => {
@@ -70,7 +70,6 @@ const Message = (props) => {
     ) {
       setIsReply(true);
     } else setIsReply(false);
-
   }, []);
 
   const displayMessage = (msg) => {
@@ -146,7 +145,7 @@ const Message = (props) => {
             </Typography>
             {isReply && (
               <Box className="chat-bubble-reply">
-                <Typography variant="p" >
+                <Typography variant="p">
                   <Button
                     sx={{
                       position: "relative",
@@ -166,7 +165,8 @@ const Message = (props) => {
                     }}
                     href={"#" + props?.message.parent_message_id}
                   >
-                    {props.usersData && props.messages &&
+                    {props.usersData &&
+                      props.messages &&
                       props.usersData.find(
                         (u) =>
                           u.id ===

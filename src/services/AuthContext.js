@@ -25,17 +25,38 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   };
 
+  const refresher = async () => {
+    api.getUser(user.data.id).then((r) => {
+      console.log(r);
+    });
+  };
+
   const updateProfile = (updatedProfile) => {
     setUser(updatedProfile);
-    localStorage.setItem('user', JSON.stringify(updatedProfile));
+    localStorage.setItem("user", JSON.stringify(updatedProfile));
   };
 
   useEffect(() => {
     refreshUser();
+
+    // Set the interval (in milliseconds)
+    const intervalMilliseconds = 600000; // 1 second
+
+    // Call the function at regular intervals
+    const intervalId = setInterval(refresher, intervalMilliseconds);
+
+    // To stop the periodic function after a certain time (e.g., after 5 seconds), you can use setTimeout:
+    const runTime = 6000000; // 5 seconds
+    setTimeout(() => {
+      clearInterval(intervalId); // Stop the periodic function
+      console.log("Periodic function stopped after 5 seconds.");
+    }, runTime);
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, setUser, login, loading, updateProfile }}>
+    <AuthContext.Provider
+      value={{ user, setUser, login, loading, updateProfile }}
+    >
       {children}
     </AuthContext.Provider>
   );

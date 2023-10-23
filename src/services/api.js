@@ -5,7 +5,7 @@ const Api = axios.create({ baseURL: process.env.REACT_APP_SERVER_URL });
 Api.interceptors.request.use((config) => {
   const token = localStorage.getItem("user");
   if (token) {
-    config.headers.Authorization = `Bearer ${JSON.parse(token).accessToken}`;
+    config.headers.Authorization = `Bearer ${JSON.parse(token).access_token}`;
   }
   return config;
 });
@@ -13,7 +13,8 @@ Api.interceptors.request.use((config) => {
 export default {
   // Auth
   getIP: () => {
-    return axios.get("https://api.ipify.org/?format=json")
+    return axios
+      .get("https://api.ipify.org/?format=json")
       .then((response) => response.json())
       .then((data) => {
         const ipAddress = data.ip;
@@ -48,6 +49,18 @@ export default {
   // Get user by id
   getUser: (userId) => {
     return Api.get(`/users/${userId}`);
+  },
+
+  // Get user by id
+  getme: (userId) => {
+    return Api.get(`/users/me/${userId}`)
+      .then((response) => {
+        console.log(response.data);
+        return response.data;
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
   },
 
   // Update User
@@ -124,6 +137,10 @@ export default {
 
   messageSeen: (id) => {
     return Api.get(`/messages/${id}`);
+  },
+
+  chatMessages: (id) => {
+    return Api.get(`/chat/messages/${id}`);
   },
 
   // Reactions
