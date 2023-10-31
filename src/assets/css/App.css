@@ -235,7 +235,7 @@ input {
 .css-1iw7z4m-MuiTypography-root{
   color:#fff;
   font-size: 1.5rem !important;
-  bottom: 10px !important;
+  bottom: 0 !important;
 }
 .messages-wrapper {
   background: #f0f1f5;

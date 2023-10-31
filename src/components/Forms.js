@@ -72,6 +72,7 @@ export function AddNewRoleForm(props) {
               onChange={(e) => handleChange(index, e)}
               fullWidth
               sx={{ m: 1 }}
+              required
             />
           </Box>
         ))}

@@ -1,16 +1,19 @@
 import { Box, Button, TextField } from "@mui/material";
 
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import api from "../services/api";
 import MultipleSelectChip from "./MultiSelect";
 import UploadImageField from "./UploadImageField";
+import { AuthContext } from "../services/AuthContext";
 
 function AddGroup(props) {
+  const { user } = useContext(AuthContext);
   const [name, setName] = useState("");
   const [members, setMembers] = useState([]);
   const [profilePic, setProfilePic] = useState("");
 
   const getMembers = (membersList) => {
+    !membersList.includes(user.data.id) && membersList.push(user.data.id);
     setMembers(membersList);
   };
 

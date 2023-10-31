@@ -95,3 +95,66 @@ export const generateRandomString = (length) => {
 
   return result;
 };
+
+export const shortenString = (inputString, maxLength) => {
+  if (inputString && inputString.length > 0) {
+    if (inputString?.length <= maxLength) {
+      return inputString;
+    }
+
+    const truncatedString = inputString?.slice(0, maxLength - 3); // Leave space for "..."
+    return truncatedString + '...';
+  }
+}
+
+export function shortenFileName(fileName, maxLength) {
+  if (fileName.length <= maxLength) {
+    return fileName;
+  }
+
+  const name = fileName.substring(0, maxLength - 3); // Leave room for "..."
+  const extension = fileName.slice(((fileName.lastIndexOf(".") - 1) >>> 0) + 2); // Get the file extension
+  return `${name}...${extension}`;
+}
+
+export const updateMessagesWithMessage = (array, object) => {
+  const objectId = object.id;
+  const index = array.findIndex(item => item.id === objectId);
+
+  if (index !== -1) {
+    // If the object with the same ID exists, replace it
+    array[index] = object;
+  } else {
+    // If the object with the same ID doesn't exist, add it to the end of the array
+    array.push(object);
+  }
+
+  return array; // Return the modified array
+}
+
+export const updateMessageReactions = (array, object) => {
+  const messageId = object.message_id;
+  const index = array.findIndex(item => item.id === messageId);
+
+  if (index !== -1) {
+    // If the object with the same ID exists, replace it
+    array[index]["reactions"].push(object);
+  }
+  return array; // Return the modified array
+}
+
+export const updateChatsWithChat = (array, object) => {
+  const objectId = object.chat_name;
+  const index = array.findIndex(item => item.chat_name === objectId);
+
+  if (index !== -1) {
+    // If the object with the same ID exists, replace it
+    array[index] = object;
+  } else {
+    // If the object with the same ID doesn't exist, add it to the end of the array
+    array.push(object);
+  }
+
+  return array; // Return the modified array
+}
+

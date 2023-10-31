@@ -130,6 +130,10 @@ export default {
     return Api.get("/chats/");
   },
 
+  getChatById: (chat_id) => {
+    return Api.get(`/chats/${chat_id}`);
+  },
+
   // Create Message
   createMessage: (message) => {
     return Api.post("/messages/", message);

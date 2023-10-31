@@ -13,10 +13,10 @@ function Home() {
   const { user } = useContext(AuthContext);
   const [isRinging, setIsRinging] = useState(false);
   const [isMeeting, setIsMeeting] = useState(false);
-  const [meeting, setMeeting] = useState(false);
+  const [meeting, setMeeting] = useState(null);
   const [callerUser, setCallerUser] = useState(null);
 
-  const [page, setPage] = useState("Messages");
+  const [page, setPage] = useState("");
 
   const getPage = (value) => {
     setPage(value);
@@ -49,7 +49,7 @@ function Home() {
   useEffect(() => {
     if (lastJsonMessage) {
       const call = JSON.parse(lastJsonMessage);
-      console.log(call);
+      // console.log(call);
       setCallerUser(call?.from);
       setMeeting(call?.meeting);
 
@@ -62,6 +62,7 @@ function Home() {
       }
     }
   }, [lastJsonMessage]);
+
 
   const handleIncomingCall = () => {
     setIsRinging(true);
@@ -77,6 +78,8 @@ function Home() {
     // Handle the logic when the user declines the call
     setIsRinging(false); // Close the ringing component
     setIsMeeting(false);
+    setMeeting(null);
+    setCallerUser(null);
   };
 
   return (
@@ -93,12 +96,20 @@ function Home() {
         updateOpenValue={setIsMeeting}
         ModalContent={
           <JitsiMeeting
+            domain="jetserver.altajer.org"
+            roomName={meeting && meeting}
+            configOverwrite={{
+              defaultLogoUrl: "",
+            }}
+            interfaceConfigOverwrite={{
+              SHOW_JITSI_WATERMARK: false,
+              PROVIDER_NAME: "Partners Chat",
+              HIDE_DEEP_LINKING_LOGO: true,
+            }}
             userInfo={{
               displayName: user.data.name,
               email: user.data.email,
             }}
-            domain="jetserver.altajer.org"
-            roomName={meeting && meeting}
             getIFrameRef={(iframeRef) => {
               iframeRef.style.height = "100%";
             }}
@@ -108,7 +119,9 @@ function Home() {
             onReadyToClose={() => {
               console.log("Jitsi Meet is ready to be closed");
               setIsMeeting(false);
-              window.location.reload();
+              setMeeting(null);
+              setCallerUser(null);
+              // window.location.reload();
             }}
           />
         }
@@ -121,20 +134,7 @@ function Home() {
       >
         <NavBar getPage={getPage} />
       </Box>
-      {page !== "" ? (
-        <>
-          <Chats page={page} makeCallWith={makeCallWith} />
-        </>
-      ) : (
-        <>
-          <Box
-            height={"auto"}
-            sx={{ width: "82%", backgroundColor: "#f0f1f5" }}
-          >
-            <Loading />
-          </Box>
-        </>
-      )}
+      <Chats page={page} makeCallWith={makeCallWith} />
     </Box>
   );
 }

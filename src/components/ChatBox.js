@@ -4,7 +4,7 @@ import SendMessage from "./SendMessage";
 import api from "../services/api";
 import { AuthContext } from "../services/AuthContext";
 import { Box, Button, IconButton, Popper, Typography } from "@mui/material";
-import { getOtherChatUserId, generateRandomString } from "../services/helper";
+import { getOtherChatUserId, generateRandomString, updateMessagesWithMessage, updateMessageReactions } from "../services/helper";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { VideoCallOutlined } from "@mui/icons-material";
 
@@ -42,7 +42,7 @@ const ChatBox = (props) => {
 
   const newChat = (chatId) => {
     api.getChatOrCreate(chatId).then((chat) => {
-      if (!chat.is_group && props.usersData) {
+      if (chat && !chat.is_group && props.usersData) {
         setMembers([]);
         props.usersData.forEach((u) => {
           if (getOtherChatUserId(chat.chat_name, user.data.id) === u.id) {
@@ -50,21 +50,23 @@ const ChatBox = (props) => {
           }
         });
       } else {
-        setChatDisplayName(chat.chat_name);
-        setMembers(chat.chat_members);
+        setChatDisplayName(chat?.chat_name);
+        setMembers(chat?.chat_members);
       }
-      setMessages(chat.messages);
+      setMessages(chat?.messages);
     });
   };
 
   const getSelectedChat = (chatName) => {
     let chat = null;
     setMessages([]);
-    props.data.forEach((c) => {
-      if (c.chat_name === chatName) {
-        chat = c;
-      }
-    });
+    if (props?.data) {
+      props.data.forEach((c) => {
+        if (c.chat_name === chatName) {
+          chat = c;
+        }
+      });
+    }
     if (chat) {
       if (!chat.is_group && props.usersData) {
         setMembers([]);
@@ -99,12 +101,9 @@ const ChatBox = (props) => {
     // Check web socket status
     console.log(connectionStatus);
     if (connectionStatus === "Closing" || connectionStatus === "Closed") {
-      window.location.reload();
+      console.log("Connection Closed!!!");
+      // window.location.reload();
     }
-
-    // if (messageAction !== oldAction) {
-    //   console.log("Action Here");
-    // }
 
     // get chat room if exist and create one if not exist
     if (props.currentChat) {
@@ -113,11 +112,30 @@ const ChatBox = (props) => {
       }
     }
 
+  }, [props.currentChat, user.data.id, connectionStatus]);
+
+
+  useEffect(() => {
+
     if (lastJsonMessage && props.currentChat) {
-      props.updateChats(Math.random());
-      getUpdatedChat(props.currentChat);
+      const msg = JSON.parse(lastJsonMessage);
+      if (msg.hasOwnProperty("reaction")) {
+        console.log(msg);
+        if (props.currentChat === msg.chat_id) {
+          let updatedMessages = updateMessageReactions(messages, msg.reaction);
+          setMessages(updatedMessages);
+        }
+      } else {
+        if (props.currentChat === msg.chat_id) {
+          let updatedMessages = updateMessagesWithMessage(messages, msg);
+          setMessages(updatedMessages);
+        }
+      }
+      props.updateChats([msg.chat_id, Math.random()]);
     }
-  }, [props.currentChat, lastJsonMessage, user.data.id, connectionStatus]);
+  }, [lastJsonMessage]);
+
+
 
   const handleClickSendMessage = (msg) => {
     sendJsonMessage(msg);
@@ -126,22 +144,24 @@ const ChatBox = (props) => {
   const makeCall = () => {
     let chat = null;
     const listOfUsers = [];
-    props.data.forEach((c) => {
-      if (c.chat_name === props.currentChat) {
-        chat = c;
-      }
-    });
-    if (chat && props.usersData) {
-      if (!chat.is_group) {
-        listOfUsers.push(getOtherChatUserId(chat.chat_name, user.data.id));
-      } else {
-        if (members.length > 0) {
-          listOfUsers = members
-            .filter((u) => u.id !== user.data.id)
-            .map((u) => u.id);
+    if (props?.data && props?.currentChat) {
+      props.data.forEach((c) => {
+        if (c.chat_name === props.currentChat) {
+          chat = c;
         }
-      }
-      props.makeCallWith(user.data, listOfUsers, generateRandomString(10));
+      });
+      if (chat && props.usersData) {
+        if (!chat.is_group) {
+          listOfUsers.push(getOtherChatUserId(chat.chat_name, user.data.id));
+        } else {
+          if (members.length > 0) {
+            listOfUsers = members
+              .filter((u) => u.id !== user.data.id)
+              .map((u) => u.id);
+          }
+        }
+        props.makeCallWith(user.data, listOfUsers, generateRandomString(10));
+        }
     }
   };
 
@@ -178,7 +198,7 @@ const ChatBox = (props) => {
                 >
                   {members.length} Members
                 </Typography>
-                <Popper id={id} open={openPoper} anchorEl={anchorEl}>
+                <Popper id={id} open={openPoper} anchorEl={anchorEl} sx={{ zIndex: 999 }}>
                   <Box
                     sx={{
                       border: 1,
@@ -204,24 +224,28 @@ const ChatBox = (props) => {
               </>
             )}
           </Typography>
-          <Button
-            sx={{
-              bgcolor: "black",
-              padding: 1,
-              position: "absolute",
-              right: 10,
-              top: 0,
-              bottom: 0,
-              margin: "auto",
-              "&:hover": {
-                backgroundColor: "black",
-              },
-              height: "70%",
-            }}
-            onClick={makeCall}
-          >
-            <VideoCallOutlined sx={{ color: "#f07d00", fontSize: 35 }} />
-          </Button>
+          {user.role.permissions.some(
+              (perm) => perm.permission === "make calls"
+          ) && (
+            <Button
+              sx={{
+                bgcolor: "black",
+                padding: 1,
+                position: "absolute",
+                right: 10,
+                top: 0,
+                bottom: 0,
+                margin: "auto",
+                "&:hover": {
+                  backgroundColor: "black",
+                },
+                height: "70%",
+              }}
+              onClick={makeCall}
+            >
+              <VideoCallOutlined sx={{ color: "#f07d00", fontSize: 35 }} />
+            </Button>
+          )}
         </Box>
       )}
       <div className="messages-wrapper">

@@ -26,9 +26,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   const refresher = async () => {
-    api.getUser(user.data.id).then((r) => {
-      console.log(r);
-    });
+    if (user) {
+      api.getUser(user.data.id).then((r) => {
+        console.log(r);
+      });
+    }
   };
 
   const updateProfile = (updatedProfile) => {

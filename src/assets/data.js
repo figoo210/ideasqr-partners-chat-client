@@ -3,6 +3,7 @@ import userImg from "./img/user.png";
 import logoPic from "./img/logol.png";
 import logoJPG from "./img/l.jpeg";
 import favIcon from "./img/fav.jpeg";
+import homeImg from "./img/home.jpg";
 import iconImg from "./img/letter-p(2).png";
 
 import phoneCall from "./gif/phone.gif";
@@ -19,6 +20,7 @@ const Assets = {
   avatar: userImg,
   logoJPG: logoJPG,
   favIcon: favIcon,
+  homeImg: homeImg,
   //GIF
   phoneCall: phoneCall,
   videoCall: videoCall,

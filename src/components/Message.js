@@ -11,7 +11,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { getLatestMessageTime } from "../services/helper";
+import { getLatestMessageTime, shortenFileName, shortenString } from "../services/helper";
 import api from "../services/api";
 import { FilePresentOutlined, PlusOne } from "@mui/icons-material";
 
@@ -52,7 +52,7 @@ const Message = (props) => {
         console.log("reaction added");
         setSelectedEmoji(emoji);
         setIsReacted(true);
-        props.sendTestMsg("reaction");
+        props.sendTestMsg({reaction: r.data, message_id: props.message.id, chat_id: props.chatId});
         closeEmojiPicker();
       })
       .catch((e) => {
@@ -79,7 +79,77 @@ const Message = (props) => {
         msg.includes(".jpeg") ||
         msg.includes(".jpg")
       ) {
-        return <img width={300} src={msg} />;
+        return (
+          <IconButton
+            onClick={() => {
+              // Create a temporary link element
+              const link = document.createElement("a");
+              link.href = msg;
+              link.target = "_blank";
+
+              // Simulate a click to trigger the download
+              link.click();
+            }}
+            sx={{
+              // Set cursor to pointer
+              cursor: 'pointer',
+              // Reset other styles to their initial values
+              backgroundColor: 'transparent',
+              border: 'none',
+              padding: 0,
+              margin: 0,
+              color: 'inherit',
+            }}
+          >
+            <img width={300} src={msg} />
+          </IconButton>
+        );
+      } else {
+        return (
+          <IconButton
+            onClick={() => {
+              // Create a temporary link element
+              const link = document.createElement("a");
+              link.href = msg;
+              link.target = "_blank";
+
+              // Simulate a click to trigger the download
+              link.click();
+            }}
+            aria-label="Download"
+          >
+            <FilePresentOutlined sx={{ fontSize: 40 }} />
+            {shortenFileName(msg.substring(msg.lastIndexOf("%2F") + 3, msg.lastIndexOf("?")), 10)}
+          </IconButton>
+        );
+      }
+    } else {
+      return msg;
+    }
+  };
+
+  const displayReplyMessage = (msg) => {
+    if (msg.includes("https://") || msg.includes("http://")) {
+      if (
+        msg.includes(".png") ||
+        msg.includes(".jpeg") ||
+        msg.includes(".jpg")
+      ) {
+        return (
+          <IconButton
+            onClick={() => {
+              // Create a temporary link element
+              const link = document.createElement("a");
+              link.href = msg;
+
+              // Simulate a click to trigger the download
+              link.click();
+            }}
+            aria-label="Download"
+          >
+            <img width={300} src={msg} />
+          </IconButton>
+        );
       } else {
         return (
           <IconButton
@@ -94,12 +164,12 @@ const Message = (props) => {
             aria-label="Download"
           >
             <FilePresentOutlined sx={{ fontSize: 40 }} />
-            {msg.substring(msg.lastIndexOf("%2F") + 3, msg.lastIndexOf("?"))}
+            {shortenFileName(msg.substring(msg.lastIndexOf("%2F") + 3, msg.lastIndexOf("?")), 10)}
           </IconButton>
         );
       }
     } else {
-      return msg;
+      return shortenString(msg, 50);
     }
   };
 
@@ -176,7 +246,7 @@ const Message = (props) => {
                       )?.name}
                     <br />"
                     {props.messages &&
-                      displayMessage(
+                      displayReplyMessage(
                         props.messages.find(
                           (m) => m.id === props.message.parent_message_id
                         )?.message || ""

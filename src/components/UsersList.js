@@ -14,7 +14,6 @@ export default function UsersList(props) {
     let chatIds = [parseInt(e.currentTarget.id), user.data.id];
     chatIds.sort((a, b) => a - b);
     props.getChat(`chat-${chatIds[0]}-${chatIds[1]}`);
-    props.updateChats(Math.random());
   };
   return (
     <List

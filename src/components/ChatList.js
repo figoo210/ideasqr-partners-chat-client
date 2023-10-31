@@ -10,6 +10,7 @@ import {
   getLatestMessageNotification,
   getLatestMessageTime,
   getOtherChatUserId,
+  shortenString,
 } from "../services/helper";
 import { Box, ListItemButton } from "@mui/material";
 import { AuthContext } from "../services/AuthContext";
@@ -45,7 +46,6 @@ export default function ChatList(props) {
         }
       }
     }
-    props.updateChats(Math.random());
   };
 
   return (
@@ -89,7 +89,7 @@ export default function ChatList(props) {
               </ListItemAvatar>
               <ListItemText
                 primary={getChatName(d)}
-                secondary={d.messages ? getLatestMessage(d.messages) : ""}
+                secondary={d.messages ? shortenString(getLatestMessage(d.messages), 20) : ""}
               />
               <Box
                 mt={1}
