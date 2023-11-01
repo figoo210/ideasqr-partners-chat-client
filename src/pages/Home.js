@@ -47,6 +47,17 @@ function Home() {
   };
 
   useEffect(() => {
+
+    console.log(connectionStatus);
+    if (connectionStatus === "Closing" || connectionStatus === "Closed") {
+      console.log("Connection Closed!!!");
+      window.location.reload();
+    }
+
+  }, [connectionStatus]);
+
+
+  useEffect(() => {
     if (lastJsonMessage) {
       const call = JSON.parse(lastJsonMessage);
       // console.log(call);

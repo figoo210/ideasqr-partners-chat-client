@@ -7,9 +7,9 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const login = async (email, password) => {
+  const login = async (email, password, user_ip) => {
     // call api
-    const response = await api.login(email, password);
+    const response = await api.login(email, password, user_ip);
     if (response.data.access_token) {
       localStorage.setItem("user", JSON.stringify(response.data));
       setUser(response.data);

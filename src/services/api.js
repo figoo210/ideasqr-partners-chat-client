@@ -7,6 +7,7 @@ Api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${JSON.parse(token).access_token}`;
   }
+
   return config;
 });
 
@@ -26,13 +27,13 @@ export default {
       });
   },
 
-  login: (email, password) => {
+  login: (email, password, user_ip) => {
     const formData = new FormData();
     formData.append("grant_type", "password");
     formData.append("username", email);
     formData.append("password", password);
-
-    return Api.post("/token", formData);
+    Api.defaults.headers["X-User-IP"] = user_ip;
+    return Api.post("/token", formData)
   },
 
   register: (user) => {

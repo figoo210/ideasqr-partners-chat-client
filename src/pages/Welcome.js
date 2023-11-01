@@ -1,4 +1,5 @@
 import React, { useContext, useState } from "react";
+import axios from "axios";
 
 import {
   Box,
@@ -26,15 +27,20 @@ const Welcome = () => {
 
   const onLogin = async (e) => {
     e.preventDefault();
-    try {
-      await login(email, password);
-    } catch (error) {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      console.log(errorCode, errorMessage);
-      setIsError(true);
-      setError("Wrong in email or password");
-    }
+    axios
+    .get("https://ipinfo.io/json")
+    .then((response) => response.data)
+    .then((data) => {
+      const ipAddress = data.ip;
+      console.log(ipAddress);
+      login(email, password, ipAddress).catch((e) => {
+        setIsError(true);
+        setError(e.response.data.detail);
+      });
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
   };
 
   return (
