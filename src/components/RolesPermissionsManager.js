@@ -14,10 +14,8 @@ import {
 } from "@mui/material";
 import api from "../services/api";
 import { AddNewRoleForm } from "./Forms";
-import { AuthContext } from "../services/AuthContext";
 
 const RolesPermissionsManager = () => {
-  const { user } = React.useContext(AuthContext);
 
   const [roles, setRoles] = useState([]);
   const [permissions, setPermissions] = useState([]);

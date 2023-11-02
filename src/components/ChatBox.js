@@ -1,12 +1,15 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 import Message from "./Message";
 import SendMessage from "./SendMessage";
 import api from "../services/api";
 import { AuthContext } from "../services/AuthContext";
-import { Box, Button, IconButton, Popper, Typography } from "@mui/material";
+import { Box, Button, Popper, Typography } from "@mui/material";
 import { getOtherChatUserId, generateRandomString, updateMessagesWithMessage, updateMessageReactions } from "../services/helper";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { VideoCallOutlined } from "@mui/icons-material";
+
+
+let tempMessageId = 100000000000;
 
 const ChatBox = (props) => {
   const { user } = useContext(AuthContext);
@@ -26,9 +29,7 @@ const ChatBox = (props) => {
   const id = openPoper ? "simple-popper" : undefined;
 
   // WebSocket
-  const [socketUrl, setSocketUrl] = useState(
-    process.env.REACT_APP_WEBSOCKET_URL
-  );
+  const socketUrl = process.env.REACT_APP_WEBSOCKET_URL;
   const { sendJsonMessage, lastJsonMessage, readyState } =
     useWebSocket(socketUrl);
 
@@ -40,24 +41,7 @@ const ChatBox = (props) => {
     [ReadyState.UNINSTANTIATED]: "Uninstantiated",
   }[readyState];
 
-  const newChat = (chatId) => {
-    api.getChatOrCreate(chatId).then((chat) => {
-      if (chat && !chat.is_group && props.usersData) {
-        setMembers([]);
-        props.usersData.forEach((u) => {
-          if (getOtherChatUserId(chat.chat_name, user.data.id) === u.id) {
-            setChatDisplayName(u.name);
-          }
-        });
-      } else {
-        setChatDisplayName(chat?.chat_name);
-        setMembers(chat?.chat_members);
-      }
-      setMessages(chat?.messages);
-    });
-  };
-
-  const getSelectedChat = (chatName) => {
+  const getSelectedChat = useCallback((chatName) => {
     let chat = null;
     setMessages([]);
     if (props?.data) {
@@ -84,50 +68,54 @@ const ChatBox = (props) => {
     } else {
       return false;
     }
-  };
+  }, [user.data.id, props.usersData, props.data]);
 
-  const getUpdatedChat = (chatId) => {
-    api
-      .chatMessages(chatId)
-      .then((response) => {
-        setMessages(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
 
   useEffect(() => {
     // Check web socket status
     console.log(connectionStatus);
     if (connectionStatus === "Closing" || connectionStatus === "Closed") {
       console.log("Connection Closed!!!");
-      // window.location.reload();
+      window.location.reload();
     }
 
     // get chat room if exist and create one if not exist
     if (props.currentChat) {
       if (!getSelectedChat(props.currentChat)) {
-        newChat(props.currentChat);
+        api.getChatOrCreate(props.currentChat).then((chat) => {
+          if (chat && !chat.is_group && props.usersData) {
+            setMembers([]);
+            props.usersData.forEach((u) => {
+              if (getOtherChatUserId(chat.chat_name, user.data.id) === u.id) {
+                setChatDisplayName(u.name);
+              }
+            });
+          } else {
+            setChatDisplayName(chat?.chat_name);
+            setMembers(chat?.chat_members);
+          }
+          setMessages(chat?.messages);
+        });
       }
     }
 
-  }, [props.currentChat, user.data.id, connectionStatus]);
+  }, [props.currentChat, user.data.id, connectionStatus, props.usersData, getSelectedChat]);
 
 
   useEffect(() => {
 
     if (lastJsonMessage && props.currentChat) {
       const msg = JSON.parse(lastJsonMessage);
+      console.log(msg);
       if (msg.hasOwnProperty("reaction")) {
-        console.log(msg);
         if (props.currentChat === msg.chat_id) {
           let updatedMessages = updateMessageReactions(messages, msg.reaction);
           setMessages(updatedMessages);
         }
       } else {
         if (props.currentChat === msg.chat_id) {
-          let updatedMessages = updateMessagesWithMessage(messages, msg);
+          let updatedMessages = updateMessagesWithMessage(messages, msg, tempMessageId);
+          tempMessageId++;
           setMessages(updatedMessages);
         }
       }
@@ -138,12 +126,27 @@ const ChatBox = (props) => {
 
 
   const handleClickSendMessage = (msg) => {
+    if (!msg.hasOwnProperty("reaction")) {
+      if (props.currentChat === msg.chat_id) {
+        const tempMessage = {
+          id: tempMessageId,
+          chat_id: msg.chat_id,
+          message: msg.message,
+          sender_id: msg.sender_id,
+          parent_message_id: msg?.parent_message_id || 0,
+          created_at: new Date(Date.now()).toISOString(),
+          seen: false
+        }
+        setMessages(prevMessages => [...prevMessages, tempMessage]);
+        console.log(tempMessage);
+      }
+    }
     sendJsonMessage(msg);
   };
 
   const makeCall = () => {
     let chat = null;
-    const listOfUsers = [];
+    let listOfUsers = [];
     if (props?.data && props?.currentChat) {
       props.data.forEach((c) => {
         if (c.chat_name === props.currentChat) {
@@ -161,7 +164,7 @@ const ChatBox = (props) => {
           }
         }
         props.makeCallWith(user.data, listOfUsers, generateRandomString(10));
-        }
+      }
     }
   };
 
@@ -225,27 +228,27 @@ const ChatBox = (props) => {
             )}
           </Typography>
           {user.role.permissions.some(
-              (perm) => perm.permission === "make calls"
+            (perm) => perm.permission === "make calls"
           ) && (
-            <Button
-              sx={{
-                bgcolor: "black",
-                padding: 1,
-                position: "absolute",
-                right: 10,
-                top: 0,
-                bottom: 0,
-                margin: "auto",
-                "&:hover": {
-                  backgroundColor: "black",
-                },
-                height: "70%",
-              }}
-              onClick={makeCall}
-            >
-              <VideoCallOutlined sx={{ color: "#f07d00", fontSize: 35 }} />
-            </Button>
-          )}
+              <Button
+                sx={{
+                  bgcolor: "black",
+                  padding: 1,
+                  position: "absolute",
+                  right: 10,
+                  top: 0,
+                  bottom: 0,
+                  margin: "auto",
+                  "&:hover": {
+                    backgroundColor: "black",
+                  },
+                  height: "70%",
+                }}
+                onClick={makeCall}
+              >
+                <VideoCallOutlined sx={{ color: "#f07d00", fontSize: 35 }} />
+              </Button>
+            )}
         </Box>
       )}
       <div className="messages-wrapper">

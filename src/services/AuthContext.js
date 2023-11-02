@@ -25,14 +25,6 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   };
 
-  const refresher = async () => {
-    if (user) {
-      api.getUser(user.data.id).then((r) => {
-        console.log(r);
-      });
-    }
-  };
-
   const updateProfile = (updatedProfile) => {
     setUser(updatedProfile);
     localStorage.setItem("user", JSON.stringify(updatedProfile));
@@ -40,6 +32,14 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     refreshUser();
+
+    const refresher = async () => {
+      if (user) {
+        api.getUser(user.data.id).then((r) => {
+          console.log(r);
+        });
+      }
+    };
 
     // Set the interval (in milliseconds)
     const intervalMilliseconds = 600000; // 1 second

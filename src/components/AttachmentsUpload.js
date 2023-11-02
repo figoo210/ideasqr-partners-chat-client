@@ -15,7 +15,6 @@ import { Delete, Done } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
 import CustomModal from "./Modal";
 import { AuthContext } from "../services/AuthContext";
-import { removeFromArrayByIndex } from "../services/helper";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -174,7 +173,7 @@ function AttachmentsUpload(props) {
         )}
       </>
     );
-  }, [filesPreview]);
+  }, [filesPreview, uploaded, uploading]);
 
   const sendAttachmentMessage = () => {
     uploadedFilesUrls.forEach((url) => {

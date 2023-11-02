@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   Dialog,
   DialogContent,
-  CircularProgress,
   Typography,
   Button,
   Box,
@@ -31,7 +30,7 @@ const Caller = ({ open, callerUser, onAnswer, onDecline }) => {
       open={open}
       BackdropProps={{
         style: { backdropFilter: "blur(3px)" }, // Customize backdrop here
-        onClick: () => {}, // Prevent clicking on the backdrop
+        onClick: () => { }, // Prevent clicking on the backdrop
       }}
     >
       <DialogContent

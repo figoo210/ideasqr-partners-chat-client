@@ -9,7 +9,7 @@ import AddUser from "../components/AddUser";
 import AddGroup from "../components/AddGroup";
 import api from "../services/api";
 import { AuthContext } from "../services/AuthContext";
-import { updateChatsWithChat, updateMessagesWithMessage } from "../services/helper";
+import { updateChatsWithChat } from "../services/helper";
 import Loading from "./Loading";
 import Assets from "../assets/data";
 

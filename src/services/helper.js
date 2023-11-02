@@ -40,7 +40,9 @@ export const getLatestMessageNotification = (messagesList, currentUserId) => {
 // };
 
 export const getLatestMessageTime = (messagesList) => {
-  messagesList.sort((a, b) => a.id - b.id);
+  if (!messagesList.length) {
+    return "-";
+  }
   const message = messagesList[messagesList.length - 1];
 
   if (!message?.created_at) {
@@ -117,9 +119,8 @@ export function shortenFileName(fileName, maxLength) {
   return `${name}...${extension}`;
 }
 
-export const updateMessagesWithMessage = (array, object) => {
-  const objectId = object.id;
-  const index = array.findIndex(item => item.id === objectId);
+export const updateMessagesWithMessage = (array, object, temp_id) => {
+  const index = array.findIndex(item => item.id === temp_id);
 
   if (index !== -1) {
     // If the object with the same ID exists, replace it

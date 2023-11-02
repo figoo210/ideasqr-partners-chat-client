@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { Box, Button, IconButton } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import { AuthContext } from "../services/AuthContext";
 import InputEmoji from "react-input-emoji";

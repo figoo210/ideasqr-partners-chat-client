@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import NavBar from "../components/NavBar";
-import Loading from "./Loading";
 import Chats from "./Chats";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { AuthContext } from "../services/AuthContext";
@@ -23,9 +22,7 @@ function Home() {
   };
 
   // Caller WebSocket
-  const [socketUrl, setSocketUrl] = useState(
-    process.env.REACT_APP_WEBSOCKET_URL_CALLS
-  );
+  const socketUrl = process.env.REACT_APP_WEBSOCKET_URL_CALLS;
   const { sendJsonMessage, lastJsonMessage, readyState } =
     useWebSocket(socketUrl);
 
@@ -72,7 +69,7 @@ function Home() {
         handleIncomingCall();
       }
     }
-  }, [lastJsonMessage]);
+  }, [lastJsonMessage, user.data.id]);
 
 
   const handleIncomingCall = () => {

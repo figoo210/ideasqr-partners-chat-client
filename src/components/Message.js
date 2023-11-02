@@ -2,65 +2,47 @@ import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../services/AuthContext";
 import InsertEmoticonIcon from "@mui/icons-material/InsertEmoticon";
 import avatar_img from "../assets/img/user.png";
-import ReplyPopover from "./ReplyPopover";
 import {
   Box,
   Button,
   IconButton,
-  Popover,
   Tooltip,
   Typography,
 } from "@mui/material";
-import { getLatestMessageTime, shortenFileName, shortenString } from "../services/helper";
-import api from "../services/api";
+import { shortenFileName, shortenString } from "../services/helper";
 import { FilePresentOutlined, PlusOne } from "@mui/icons-material";
+import MessageAction from "./MessageAction";
 
-// Emoji component
-const Emoji = ({ emoji, onEmojiClick }) => (
-  <Button sx={{ fontSize: 30, cursor: "pointer" }} onClick={onEmojiClick}>
-    {emoji}
-  </Button>
-);
 
 const Message = (props) => {
   const { user } = useContext(AuthContext);
+  const [messageTime, setMessageTime] = useState("hh:mm PM \n Mon d, yyyy");
+  const [reactions, setReactions] = useState([]);
   const [isReply, setIsReply] = useState(false);
-  const [isReacted, setIsReacted] = useState(false);
-  const [selectedEmoji, setSelectedEmoji] = useState(null);
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [isHover, setIsHover] = useState(false);
 
-  const openEmojiPicker = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const closeEmojiPicker = () => {
-    setAnchorEl(null);
-  };
-  const openEmoji = Boolean(anchorEl);
-  const id = openEmoji ? "simple-popover" : undefined;
-
-  const handleEmojiClick = (e) => {
-    // add emoji to message
-    let emoji = e.currentTarget.textContent;
-    const newReaction = {
-      message_id: props.message.id,
-      user_id: user.data.id,
-      reaction: emoji,
-    };
-    api
-      .reactOnMessage(newReaction)
-      .then((r) => {
-        console.log("reaction added");
-        setSelectedEmoji(emoji);
-        setIsReacted(true);
-        props.sendTestMsg({reaction: r.data, message_id: props.message.id, chat_id: props.chatId});
-        closeEmojiPicker();
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  };
+  const formatTime = (t) => {
+    const localTime = new Date(t).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    const localDate = new Date(t).toLocaleDateString([], {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+    return `${localTime}\n${localDate}`;
+  }
 
   useEffect(() => {
+    if (props?.message) {
+      // Message Time
+      setMessageTime(formatTime(props?.message.created_at));
+
+      // Message Reactions
+      setReactions(props?.message.reactions);
+
+    }
     // scroll to the bottom of the messages wrapper div
     const messagesWrapper = document.querySelector(".messages-wrapper");
     messagesWrapper.scrollTop = messagesWrapper.scrollHeight;
@@ -70,7 +52,7 @@ const Message = (props) => {
     ) {
       setIsReply(true);
     } else setIsReply(false);
-  }, []);
+  }, [props.message]);
 
   const displayMessage = (msg) => {
     if (msg.includes("https://") || msg.includes("http://")) {
@@ -101,7 +83,7 @@ const Message = (props) => {
               color: 'inherit',
             }}
           >
-            <img width={300} src={msg} />
+            <img alt="message media" width={300} src={msg} />
           </IconButton>
         );
       } else {
@@ -147,7 +129,7 @@ const Message = (props) => {
             }}
             aria-label="Download"
           >
-            <img width={300} src={msg} />
+            <img alt="message media" width={300} src={msg} />
           </IconButton>
         );
       } else {
@@ -173,6 +155,23 @@ const Message = (props) => {
     }
   };
 
+  const handleMouseEnter = () => {
+    setIsHover(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHover(false);
+  };
+
+  const updateLiveReaction = (r) => {
+    if (reactions) {
+      setReactions([...reactions, r]);
+    } else {
+      setReactions([r]);
+    }
+
+  }
+
   if (!props.message) return;
 
   return (
@@ -182,12 +181,13 @@ const Message = (props) => {
         justifyContent: "start",
         alignItems: "start",
       }}
+      id={props.message.id}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <Box
-        className={`chat-bubble ${
-          props.message.sender_id === user.data.id ? "right" : ""
-        }`}
-        id={props.message.id}
+        className={`chat-bubble ${props.message.sender_id === user.data.id ? "right" : ""
+          }`}
       >
         <Box
           sx={{ direction: "ltr", display: "flex", alignItems: "flex-start" }}
@@ -260,93 +260,59 @@ const Message = (props) => {
               {displayMessage(props.message.message || "")}
             </Typography>
 
-            {/* Message Actions */}
+            {/* Message Time */}
 
             <Box
               sx={{
                 display: "flex",
-                justifyContent: "center",
+                justifyContent: "flex-end",
                 alignItems: "center",
                 mt: 2,
               }}
               className="chat-bubble__actions"
             >
-              <Button
-                className="react-button"
-                aria-describedby={id}
-                variant="text"
-                onClick={openEmojiPicker}
-                sx={{ flex: 1 }}
-              >
-                {isReacted ? (
-                  <Typography fontSize={20} fontWeight={700}>
-                    {selectedEmoji ? selectedEmoji : "❤️"}
-                  </Typography>
-                ) : (
-                  <InsertEmoticonIcon color="info" />
-                )}
-              </Button>
-              <Popover
-                id={id}
-                open={openEmoji}
-                anchorEl={anchorEl}
-                onClose={closeEmojiPicker}
-                anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "left",
-                }}
-              >
-                <Box>
-                  <Emoji onEmojiClick={handleEmojiClick} emoji="👍" />
-                  <Emoji onEmojiClick={handleEmojiClick} emoji="❤️" />
-                  <Emoji onEmojiClick={handleEmojiClick} emoji="😂" />
-                  <Emoji onEmojiClick={handleEmojiClick} emoji="😮" />
-                  <Emoji onEmojiClick={handleEmojiClick} emoji="😢" />
-                  <Emoji onEmojiClick={handleEmojiClick} emoji="🙏" />
-                </Box>
-              </Popover>
-              <ReplyPopover
-                style={{ flex: 1 }}
-                chatId={props.chatId}
-                messageId={props.message.id}
-                sendTestMsg={props.sendTestMsg}
-                scroll={props.scroll}
-              />
               <Typography
                 variant="body2"
                 color="grey"
                 flex={1}
-                textAlign={"center"}
+                textAlign={"right"}
               >
-                {getLatestMessageTime([props.message])}
+                {messageTime}
               </Typography>
             </Box>
 
             {/* Reactions */}
 
-            {props.message.reactions && props.message.reactions.length !== 0 ? (
+            {reactions && reactions?.length !== 0 ? (
               <Tooltip
-                title={props.message.reactions.map((reaction, idx) => (
+                title={reactions.map((reaction, idx) => (
                   <Box
                     sx={{
                       display: "flex",
                       justifyContent: "space-between",
                       alignItems: "center",
+                      borderBottom: 2,
+                      borderBottomColor: "white",
                     }}
                     key={idx}
                   >
-                    <Box flex={4} mx={1}>
+                    <Box flex={3} mx={1}>
                       {props.usersData &&
                         props.usersData.map((userData, idx) => {
                           if (userData.id === reaction.user_id) {
                             return (
-                              <Typography key={idx} variant="p">
+                              <Typography key={idx} variant="body2">
                                 {userData?.name}
                               </Typography>
                             );
+                          } else {
+                            return null;
                           }
                         })}
                     </Box>
+                    <Typography flex={2} variant="body2" mx={1}>
+                      {reaction?.created_at ? formatTime(reaction?.created_at) : formatTime(Date.now())}
+                    </Typography>
                     <Typography flex={1} variant="h6" mx={1}>
                       {reaction.reaction}
                     </Typography>
@@ -372,6 +338,19 @@ const Message = (props) => {
               <></>
             )}
           </Box>
+
+          {/* Message Actions */}
+
+          {isHover && (
+            <MessageAction
+              message={props.message}
+              sendTestMsg={props.sendTestMsg}
+              scroll={props.scroll}
+              chatId={props.chatId}
+              isHover={isHover}
+              updateLiveReaction={updateLiveReaction}
+            />
+          )}
         </Box>
       </Box>
     </Box>
