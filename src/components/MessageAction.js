@@ -37,12 +37,13 @@ function MessageAction(props) {
       message_id: props.message.id,
       user_id: user.data.id,
       reaction: emoji,
+      message: props.message.message,
     };
+    props.sendTestMsg({ reaction: newReaction, message_id: props.message.id, chat_id: props.chatId });
     api
       .reactOnMessage(newReaction)
       .then((r) => {
         console.log("reaction added");
-        props.sendTestMsg({ reaction: r.data, message_id: props.message.id, chat_id: props.chatId });
       })
       .catch((e) => {
         console.log(e);
@@ -51,6 +52,7 @@ function MessageAction(props) {
       message_id: props.message.id,
       user_id: user.data.id,
       reaction: emoji,
+      message: props.message.message,
     });
     setSelectedEmoji(emoji);
     setIsReacted(true);

@@ -32,7 +32,6 @@ const Welcome = () => {
     .then((response) => response.data)
     .then((data) => {
       const ipAddress = data.ip;
-      console.log(ipAddress);
       login(email, password, ipAddress).catch((e) => {
         setIsError(true);
         setError(e.response.data.detail);

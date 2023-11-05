@@ -19,14 +19,12 @@ export default function ReplyPopover(props) {
   const id = open ? "simple-popover" : undefined;
 
   const handleSubmit = () => {
-    console.log("sent!");
     const newMessage = {
       chat_id: props.chatId,
       sender_id: user.data.id,
       message: reply,
       parent_message_id: props.messageId,
     };
-    console.log(newMessage);
     props.sendTestMsg(newMessage);
     setReply("");
     props.scroll.current.scrollIntoView({ behavior: "smooth" });

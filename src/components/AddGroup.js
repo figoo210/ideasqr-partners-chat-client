@@ -26,7 +26,6 @@ function AddGroup(props) {
       members: members,
       image_url: profilePic,
     };
-    console.log(newGroup);
     api.createChatGroup(newGroup).then((chat) => {
       props.getAddedData(chat);
     });

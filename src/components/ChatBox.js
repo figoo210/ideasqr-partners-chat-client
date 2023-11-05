@@ -9,7 +9,7 @@ import useWebSocket, { ReadyState } from "react-use-websocket";
 import { VideoCallOutlined } from "@mui/icons-material";
 
 
-let tempMessageId = 100000000000;
+let tempMessageId = Math.random();
 
 const ChatBox = (props) => {
   const { user } = useContext(AuthContext);
@@ -99,14 +99,16 @@ const ChatBox = (props) => {
       }
     }
 
-  }, [props.currentChat, user.data.id, connectionStatus, props.usersData, getSelectedChat]);
+  }, [props.currentChat, user.data.id, connectionStatus]);
 
 
   useEffect(() => {
-
-    if (lastJsonMessage && props.currentChat) {
+    if (lastJsonMessage) {
       const msg = JSON.parse(lastJsonMessage);
-      console.log(msg);
+      if (msg.hasOwnProperty("meeting")) {
+        return;
+      }
+
       if (msg.hasOwnProperty("reaction")) {
         if (props.currentChat === msg.chat_id) {
           let updatedMessages = updateMessageReactions(messages, msg.reaction);
@@ -115,11 +117,11 @@ const ChatBox = (props) => {
       } else {
         if (props.currentChat === msg.chat_id) {
           let updatedMessages = updateMessagesWithMessage(messages, msg, tempMessageId);
-          tempMessageId++;
+          tempMessageId = Math.random();
           setMessages(updatedMessages);
         }
       }
-      props.updateChats([msg.chat_id, Math.random()]);
+      msg?.chat_id && props.updateChats([msg.chat_id, Math.random()]);
     }
   }, [lastJsonMessage]);
 
@@ -138,7 +140,6 @@ const ChatBox = (props) => {
           seen: false
         }
         setMessages(prevMessages => [...prevMessages, tempMessage]);
-        console.log(tempMessage);
       }
     }
     sendJsonMessage(msg);
@@ -159,8 +160,8 @@ const ChatBox = (props) => {
         } else {
           if (members.length > 0) {
             listOfUsers = members
-              .filter((u) => u.id !== user.data.id)
-              .map((u) => u.id);
+              .filter((u) => u.user_id !== user.data.id)
+              .map((u) => u.user_id);
           }
         }
         props.makeCallWith(user.data, listOfUsers, generateRandomString(10));

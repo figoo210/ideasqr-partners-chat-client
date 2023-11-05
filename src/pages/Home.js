@@ -6,10 +6,30 @@ import useWebSocket, { ReadyState } from "react-use-websocket";
 import { AuthContext } from "../services/AuthContext";
 import Caller from "../components/Caller";
 import { FullReadyModal } from "../components/Modal";
+import Notification from "../components/Notification";
 import { JitsiMeeting } from "@jitsi/react-sdk";
+import { notifyMessage, notifyReaction } from "../services/helper";
+import Assets from "../assets/data";
 
 function Home() {
   const { user } = useContext(AuthContext);
+  const audio = new Audio(Assets.messageNotification);
+
+  // Notifications
+  const [allUsers, setAllUsers] = useState();
+  const [allGroups, setAllGroups] = useState();
+  const [notification, setNotification] = useState("");
+  const [notify, setNotify] = useState(false);
+
+  const openNotification = () => {
+    audio.play();
+    setNotify(true);
+  };
+
+  const closeNotification = () => {
+    setNotify(false);
+  };
+
   const [isRinging, setIsRinging] = useState(false);
   const [isMeeting, setIsMeeting] = useState(false);
   const [meeting, setMeeting] = useState(null);
@@ -57,6 +77,19 @@ function Home() {
   useEffect(() => {
     if (lastJsonMessage) {
       const call = JSON.parse(lastJsonMessage);
+      if (!call.hasOwnProperty("meeting")) {
+        // Notification
+        if (call.hasOwnProperty("reaction")) {
+          let n = notifyReaction(user.data.id, call, allUsers, allGroups); // Notification
+          setNotification(n);
+          n && openNotification();
+        } else {
+          let n = notifyMessage(user.data.id, call, allUsers, allGroups); // Notification
+          setNotification(n);
+          n && openNotification();
+        }
+        return;
+      }
       // console.log(call);
       setCallerUser(call?.from);
       setMeeting(call?.meeting);
@@ -92,6 +125,7 @@ function Home() {
 
   return (
     <Box sx={{ display: "flex", width: "auto%" }}>
+      <Notification open={notify} handleClose={closeNotification} msg={notification} />
       <Caller
         open={isRinging}
         callerUser={callerUser}
@@ -142,7 +176,7 @@ function Home() {
       >
         <NavBar getPage={getPage} />
       </Box>
-      <Chats page={page} makeCallWith={makeCallWith} />
+      <Chats page={page} makeCallWith={makeCallWith} getAllUsers={setAllUsers} getAllGroups={setAllGroups} />
     </Box>
   );
 }

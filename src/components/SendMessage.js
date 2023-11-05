@@ -29,7 +29,6 @@ const SendMessage = ({ scroll, chatId, sendTestMsg }) => {
       setBtnDisabled(true);
       return;
     }
-    console.log("sent!");
     const newMessage = {
       chat_id: chatId,
       sender_id: user.data.id,

@@ -53,6 +53,7 @@ function Chats(props) {
 
   const getData = async () => {
     api.getUsers().then((response) => {
+      props.getAllUsers(response.data);
       setUsersData(response.data);
     });
 
@@ -66,9 +67,10 @@ function Chats(props) {
           directChats.push(element);
         }
       });
+      props.getAllGroups(groupChats)
       setDChats(directChats);
       setGChats(groupChats);
-      return {directChats: directChats, groupChats: groupChats};
+      return { directChats: directChats, groupChats: groupChats };
     }).then((r) => {
       setIsLoading(false);
       updateLists(r);
@@ -139,7 +141,7 @@ function Chats(props) {
           }}
         >
         </Box>
-      ): (
+      ) : (
         <>
           <Box
             height={"100vh"}

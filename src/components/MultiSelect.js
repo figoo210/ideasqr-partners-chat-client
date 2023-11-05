@@ -30,7 +30,6 @@ export default function MultipleSelectChip(props) {
     const {
       target: { value },
     } = event;
-    console.log(value);
     let v = typeof value === "string" ? value.split(",") : value;
     props.getMembers(v);
     setPersonName(v);

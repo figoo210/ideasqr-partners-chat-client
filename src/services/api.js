@@ -19,7 +19,6 @@ export default {
       .then((response) => response.json())
       .then((data) => {
         const ipAddress = data.ip;
-        console.log(ipAddress);
         return ipAddress;
       })
       .catch((error) => {
@@ -56,7 +55,6 @@ export default {
   getme: (userId) => {
     return Api.get(`/users/me/${userId}`)
       .then((response) => {
-        console.log(response.data);
         return response.data;
       })
       .catch((error) => {

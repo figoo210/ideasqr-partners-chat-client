@@ -25,7 +25,6 @@ export function AddNewRoleForm(props) {
       api
         .addRole(record)
         .then((r) => {
-          console.log(r.data);
           props.getNewRoles(r.data);
         })
         .catch((e) => {
@@ -33,7 +32,6 @@ export function AddNewRoleForm(props) {
         });
     }
 
-    console.log(records);
 
     console.log("Records saved!");
     setRecords([

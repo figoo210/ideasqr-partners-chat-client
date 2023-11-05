@@ -1,3 +1,6 @@
+import Assets from "../assets/data";
+
+
 export const timestampToTime = (timestampInSeconds) => {
   const date = new Date(timestampInSeconds * 1000); // convert to milliseconds
 
@@ -85,6 +88,12 @@ export const getOtherChatUserId = (chatName, currentUserId) => {
   return parseInt(chatNameArr[0]);
 };
 
+export const getChatUsersIds = (chatName) => {
+  let chatNameArr = chatName.split("-");
+  chatNameArr = removeValueFromArray(chatNameArr, "chat");
+  return [parseInt(chatNameArr[0]), parseInt(chatNameArr[1])];
+};
+
 export const generateRandomString = (length) => {
   const characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -158,4 +167,143 @@ export const updateChatsWithChat = (array, object) => {
 
   return array; // Return the modified array
 }
+
+
+// Handle Notifications
+
+export function showNotification(title, body, iconUrl) {
+  if (!('Notification' in window)) {
+    console.log('Web notifications not supported in this browser.');
+    return;
+  }
+  console.log(document.hidden);
+
+  if (document.hidden && Notification.permission === 'granted') {
+    // If permission is already granted, show the notification.
+    show();
+  } else if (Notification.permission !== 'denied') {
+    // Request permission from the user.
+    Notification.requestPermission().then(function (permission) {
+      if (document.hidden && permission === 'granted') {
+        show();
+      } else {
+        console.log('Notification permission denied by the user.');
+      }
+    });
+  }
+
+  function show() {
+
+    const options = {
+      body: body,
+      icon: iconUrl,
+    };
+
+    const notification = new Notification(title, options);
+
+    notification.onclick = function () {
+      // Handle notification click event, e.g., open a specific URL.
+      console.log('Notification clicked');
+      // window.open('https://example.com'); // You can open a URL here.
+    };
+
+    notification.onclose = function () {
+      // Handle notification close event.
+      console.log('Notification closed');
+    };
+  }
+}
+
+
+export const notifyReaction = (currentUserId, msg, users, groups) => {
+  if (currentUserId === msg.reaction.user_id) {
+    return null;
+  }
+
+  let chatPattern = /^chat-.+-.*$/;
+  let checker = msg?.chat_id ? chatPattern.test(msg.chat_id) : false;
+
+  if (checker && !getChatUsersIds(msg?.chat_id).includes(currentUserId)) {
+    return null;
+  }
+  const isUserInGroupChat = (chatId) => {
+    for (let i = 0; i < groups.length; i++) {
+      if (groups[i].chat_name === chatId) {
+        return groups[i].chat_members?.some((item) => item.user_id === currentUserId);
+      }
+    }
+
+    // If no match is found, you can return a default value (e.g., false) here.
+    return false;
+  };
+  if (!checker && msg?.chat_id && !isUserInGroupChat(msg?.chat_id)) {
+    return null;
+  }
+
+
+  let userName;
+  users.forEach(u => {
+    if (u.id === msg.reaction.user_id) {
+      userName = u.name;
+    }
+  });
+
+  let body = checker ? `${userName}: Reacted ${msg.reaction.reaction} to "${msg.reaction.message}"` :
+    `${msg.chat_id}: ${userName} reacted ${msg.reaction.reaction} to "${msg.reaction.message}"`;
+
+  showNotification(
+    'Partners Chat | New Reaction',
+    body,
+    Assets.favIcon
+  );
+
+  return body;
+}
+
+
+export const notifyMessage = (currentUserId, msg, users, groups) => {
+  if (currentUserId === msg.sender_id) {
+    return null;
+  }
+
+  let chatPattern = /^chat-.+-.*$/;
+  let checker = msg?.chat_id ? chatPattern.test(msg.chat_id) : false;
+
+  if (checker && !getChatUsersIds(msg?.chat_id).includes(currentUserId)) {
+    return null;
+  }
+  const isUserInGroupChat = (chatId) => {
+    for (let i = 0; i < groups.length; i++) {
+      if (groups[i].chat_name === chatId) {
+        return groups[i].chat_members?.some((item) => item.user_id === currentUserId);
+      }
+    }
+
+    // If no match is found, you can return a default value (e.g., false) here.
+    return false;
+  };
+  if (!checker && msg?.chat_id && !isUserInGroupChat(msg?.chat_id)) {
+    return null;
+  }
+
+
+  let userName;
+  users.forEach(u => {
+    if (u.id === msg.sender_id) {
+      userName = u.name;
+    }
+  });
+
+  let body = checker ? `${userName}: ${msg.message}` : `${msg.chat_id}: ${userName}: ${msg.message}`;
+
+  showNotification(
+    'Partners Chat | New Message',
+    body,
+    Assets.favIcon
+  );
+
+  return body;
+}
+
+
 

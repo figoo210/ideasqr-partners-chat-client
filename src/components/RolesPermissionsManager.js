@@ -80,7 +80,6 @@ const RolesPermissionsManager = () => {
       api
         .newRolePermission(newRP)
         .then((resp) => {
-          console.log(resp.data);
           setRoles(resp.data);
         })
         .catch((err) => {

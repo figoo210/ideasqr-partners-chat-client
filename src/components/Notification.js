@@ -1,34 +1,14 @@
 import * as React from "react";
+import { Alert, Snackbar } from "@mui/material";
 
-import messageSound from "../assets/audio/alert.wav";
-import callSound from "../assets/audio/alert.wav";
-import { Alert } from "@mui/material";
-
-export function Notification({
-  type,
-  msg,
-  msgType,
-  handleClose,
-  handleAcceptCalls,
-  handleOpenMessage,
-}) {
-  const audio = React.useRef();
-
-  React.useEffect(() => {
-    if (type === "message") {
-      audio.current.src = messageSound;
-      audio.current.play();
-    } else if (type === "call") {
-      audio.current.src = callSound;
-      audio.current.play();
-    }
-  }, [type]);
+export function Notification({ open, handleClose, msg }) {
 
   return (
-    <Alert onClose={handleClose} severity={msgType} sx={{ width: "100%" }}>
-      {msg}
-      <audio ref={audio} />
-    </Alert>
+    <Snackbar open={open} autoHideDuration={5000} onClose={handleClose}>
+      <Alert onClose={handleClose} severity="success">
+        {msg || "New Message."}
+      </Alert>
+    </Snackbar>
   );
 }
 

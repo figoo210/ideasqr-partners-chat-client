@@ -55,7 +55,6 @@ const IPGroupManager = () => {
 
   const handleUpdateIPGroup = async () => {
     try {
-      console.log({ ip, name, users });
       await api.updateIPGroup({ ip, name, users });
       fetchIPGroups();
       setName("");

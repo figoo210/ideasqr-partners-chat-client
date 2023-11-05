@@ -12,6 +12,7 @@ import videoConference from "./gif/video-conference.gif";
 import groupConference from "./gif/video-conference(1).gif";
 
 import alertSound from "./audio/alert.wav";
+import messageSound from "./audio/MessageNotification.wav";
 
 const Assets = {
   logo: logoImg,
@@ -29,6 +30,7 @@ const Assets = {
 
   // Audio
   alertSound: alertSound,
+  messageNotification: messageSound,
 };
 
 export default Assets;

@@ -20,6 +20,37 @@ import api from "../services/api";
 export default function ChatList(props) {
   const { user } = React.useContext(AuthContext);
 
+  // State variable to hold the sorted chat list
+  const [sortedChats, setSortedChats] = React.useState([]);
+
+  // Function to sort chats based on the last message
+  const sortChats = () => {
+    const sorted = [...props.data];
+    sorted.sort((a, b) => {
+      const aLastMessage = a.messages ? a.messages[a.messages.length - 1] : null;
+      const bLastMessage = b.messages ? b.messages[b.messages.length - 1] : null;
+
+      if (!aLastMessage) return 1; // Put chats with no messages at the end
+      if (!bLastMessage) return -1;
+
+      // Convert timestamp strings to Date objects
+      const aTimestamp = new Date(aLastMessage.created_at);
+      const bTimestamp = new Date(bLastMessage.created_at);
+
+      // Compare the timestamps of the last messages
+      return bTimestamp - aTimestamp;
+    });
+
+    setSortedChats(sorted);
+  };
+
+  // Use useEffect to sort the chats when the component mounts or whenever props.data changes
+  React.useEffect(() => {
+    if (props.data) {
+      sortChats();
+    }
+  }, [props.data]);
+
   const getChatName = (chat) => {
     if (!chat.is_group && props.usersData && chat.chat_name) {
       for (let i = 0; i < props.usersData.length; i++) {
@@ -57,9 +88,9 @@ export default function ChatList(props) {
         maxHeight: "70vh",
       }}
     >
-      {props.data &&
-        props?.data?.length > 0 &&
-        props.data.map((d, idx) => {
+      {sortedChats &&
+        sortedChats.length > 0 &&
+        sortedChats.map((d, idx) => {
           if (
             d.is_group &&
             !d.chat_members?.some((item) => item.user_id === user.data.id)
