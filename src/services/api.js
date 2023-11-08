@@ -142,6 +142,10 @@ export default {
     return Api.get(`/messages/${id}`);
   },
 
+  updateMessage: (id, message) => {
+    return Api.put(`/messages/${id}`, message);
+  },
+
   chatMessages: (id) => {
     return Api.get(`/chat/messages/${id}`);
   },
@@ -170,5 +174,9 @@ export default {
 
   deleteIPGroup: (ip) => {
     return Api.delete(`/ip_groups/${ip}`);
+  },
+
+  addShortcutReply: (id, reply) => {
+    return Api.put(`/reply_shortcuts/${id}`, { reply: reply });
   },
 };

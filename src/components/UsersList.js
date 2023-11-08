@@ -15,6 +15,17 @@ export default function UsersList(props) {
     chatIds.sort((a, b) => a - b);
     props.getChat(`chat-${chatIds[0]}-${chatIds[1]}`);
   };
+
+  React.useEffect(() => { }, [props.data, props.searchField])
+
+  const filteredChats = props.data && props.data.length > 0 && props.data.filter((chat) => {
+    if (props.searchField && props.searchField.length > 0) {
+      return chat.name.toLowerCase().includes(props.searchField.toLowerCase());
+    } else {
+      return true;
+    }
+  });
+
   return (
     <List
       sx={{
@@ -24,8 +35,8 @@ export default function UsersList(props) {
         maxHeight: "70vh",
       }}
     >
-      {props.data &&
-        props.data.map((d, idx) => {
+      {filteredChats &&
+        filteredChats.map((d, idx) => {
           if (user.data.id !== d.id) {
             return (
               <ListItemButton

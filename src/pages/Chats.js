@@ -17,6 +17,7 @@ function Chats(props) {
   const { user } = React.useContext(AuthContext);
 
   const [isLoading, setIsLoading] = useState(true);
+  const [searchField, setSearchField] = useState("");
 
   const [data, setData] = useState(null);
   const [usersData, setUsersData] = useState(null);
@@ -184,6 +185,7 @@ function Chats(props) {
                         updateOpenValue={setUsersModalOpen}
                         ModalContent={AddUser}
                         getAddedData={getAddedUser}
+                        usersData={usersData}
                       />
                     </>
                   )}
@@ -224,18 +226,21 @@ function Chats(props) {
                   marginBottom: 3,
                 }}
                 color="primary"
+                onChange={(e) => setSearchField(e.target.value)}
               />
               {props.page !== "Contact List" && (
                 <ChatList
                   getChat={getChat}
                   data={data}
                   usersData={usersData}
+                  searchField={searchField}
                 />
               )}
               {props.page === "Contact List" && (
                 <UsersList
                   getChat={getChat}
                   data={data}
+                  searchField={searchField}
                 />
               )}
             </Box>

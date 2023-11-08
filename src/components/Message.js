@@ -12,6 +12,9 @@ import {
 import { shortenFileName, shortenString } from "../services/helper";
 import { FilePresentOutlined, PlusOne } from "@mui/icons-material";
 import MessageAction from "./MessageAction";
+import CustomModal from "./Modal";
+import AddUser from "./AddUser";
+import EditMessage from "./EditMessage";
 
 
 const Message = (props) => {
@@ -20,6 +23,9 @@ const Message = (props) => {
   const [reactions, setReactions] = useState([]);
   const [isReply, setIsReply] = useState(false);
   const [isHover, setIsHover] = useState(false);
+
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editedMessage, setEditedMessage] = useState(null);
 
   const formatTime = (t) => {
     const localTime = new Date(t).toLocaleTimeString([], {
@@ -53,6 +59,15 @@ const Message = (props) => {
       setIsReply(true);
     } else setIsReply(false);
   }, [props.message]);
+
+
+  useEffect(() => {
+    if (props?.message) {
+      // Message Reactions
+      setReactions(props?.message.reactions);
+
+    }
+  }, [props.message, reactions]);
 
   const displayMessage = (msg) => {
     if (msg.includes("https://") || msg.includes("http://")) {
@@ -169,9 +184,17 @@ const Message = (props) => {
     } else {
       setReactions([r]);
     }
-
   }
 
+  const handleDoubleClick = () => {
+    if (props.message.sender_id === user.data.id) {
+      setEditModalOpen(true);
+    }
+  };
+
+  const getEditedMessage = (m) => {
+    setEditedMessage(m);
+  }
   if (!props.message) return;
 
   return (
@@ -184,6 +207,7 @@ const Message = (props) => {
       id={props.message.id}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      onDoubleClick={handleDoubleClick}
     >
       <Box
         className={`chat-bubble ${props.message.sender_id === user.data.id ? "right" : ""
@@ -257,7 +281,7 @@ const Message = (props) => {
               </Box>
             )}
             <Typography variant="p" className="user-message">
-              {displayMessage(props.message.message || "")}
+              {displayMessage(editedMessage || props.message.message || "")}
             </Typography>
 
             {/* Message Time */}
@@ -353,6 +377,17 @@ const Message = (props) => {
           )}
         </Box>
       </Box>
+
+      {/* Edit Message */}
+      {editModalOpen && (
+        <EditMessage
+          open={editModalOpen}
+          setOpen={setEditModalOpen}
+          message={props.message}
+          getEditedMessage={getEditedMessage}
+          sendTestMsg={props.sendTestMsg}
+        />
+      )}
     </Box>
   );
 };

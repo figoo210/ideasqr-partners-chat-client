@@ -49,7 +49,7 @@ export default function ChatList(props) {
     if (props.data) {
       sortChats();
     }
-  }, [props.data]);
+  }, [props.data, props.searchField]);
 
   const getChatName = (chat) => {
     if (!chat.is_group && props.usersData && chat.chat_name) {
@@ -79,6 +79,14 @@ export default function ChatList(props) {
     }
   };
 
+  const filteredChats = sortChats && sortedChats.length > 0 && sortedChats.filter((chat) => {
+    if (props.searchField && props.searchField.length > 0) {
+      return getChatName(chat).toLowerCase().includes(props.searchField.toLowerCase());
+    } else {
+      return true;
+    }
+  });
+
   return (
     <List
       sx={{
@@ -88,9 +96,9 @@ export default function ChatList(props) {
         maxHeight: "70vh",
       }}
     >
-      {sortedChats &&
-        sortedChats.length > 0 &&
-        sortedChats.map((d, idx) => {
+      {filteredChats &&
+        filteredChats.length > 0 &&
+        filteredChats.map((d, idx) => {
           if (
             d.is_group &&
             !d.chat_members?.some((item) => item.user_id === user.data.id)

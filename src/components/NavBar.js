@@ -17,6 +17,7 @@ import {
   Settings,
   LockOpen,
   Person,
+  ShortcutOutlined,
 } from "@mui/icons-material";
 import { FullModal } from "./Modal";
 import avatar_img from "../assets/img/user.png";
@@ -26,18 +27,24 @@ import UserManagement from "./UserManagement";
 import RolesPermissionsManager from "./RolesPermissionsManager";
 import IPGroupManager from "./IPGroups";
 import ProfileManagement from "./ProfileManagement";
+import ReplyShortcutsManager from "./ReplyShortcutsManager";
 
 const NavBar = (props) => {
   const { user } = useContext(AuthContext);
   // Modals and toggle
   const [open, setOpen] = React.useState(false);
   const [profileModalOpen, setProfileModalOpen] = React.useState(false);
+  const [shortcutsModalOpen, setShortcutsModalOpen] = React.useState(false);
   const [usersModalOpen, setUsersModalOpen] = React.useState(false);
   const [roleModalOpen, setRoleModalOpen] = React.useState(false);
   const [ipModalOpen, setIpModalOpen] = React.useState(false);
 
   const openProfileModal = () => {
     setProfileModalOpen(true);
+  };
+
+  const openShortcutsModal = () => {
+    setShortcutsModalOpen(true);
   };
 
   const openUsersModal = () => {
@@ -162,68 +169,83 @@ const NavBar = (props) => {
               ModalContent={ProfileManagement}
             />
 
+            <ListItemButton sx={{ pl: 5 }} onClick={openShortcutsModal}>
+              <ListItemIcon>
+                <ShortcutOutlined sx={{ color: "white" }} fontSize="medium" />
+              </ListItemIcon>
+              <ListItemText>
+                <Typography fontSize={16}>Shortcuts</Typography>
+              </ListItemText>
+            </ListItemButton>
+            <FullModal
+              open={shortcutsModalOpen}
+              modalTitle={"Reply Shortcuts"}
+              updateOpenValue={setShortcutsModalOpen}
+              ModalContent={ReplyShortcutsManager}
+            />
+
             {user.role.permissions.some(
               (perm) => perm.permission === "edit users"
             ) && (
-              <>
-                <ListItemButton sx={{ pl: 5 }} onClick={openUsersModal}>
-                  <ListItemIcon>
-                    <Edit sx={{ color: "white" }} fontSize="medium" />
-                  </ListItemIcon>
-                  <ListItemText>
-                    <Typography fontSize={16}>Users</Typography>
-                  </ListItemText>
-                </ListItemButton>
-                <FullModal
-                  open={usersModalOpen}
-                  modalTitle={"Manage Users"}
-                  updateOpenValue={setUsersModalOpen}
-                  ModalContent={UserManagement}
-                />
-              </>
-            )}
+                <>
+                  <ListItemButton sx={{ pl: 5 }} onClick={openUsersModal}>
+                    <ListItemIcon>
+                      <Edit sx={{ color: "white" }} fontSize="medium" />
+                    </ListItemIcon>
+                    <ListItemText>
+                      <Typography fontSize={16}>Users</Typography>
+                    </ListItemText>
+                  </ListItemButton>
+                  <FullModal
+                    open={usersModalOpen}
+                    modalTitle={"Manage Users"}
+                    updateOpenValue={setUsersModalOpen}
+                    ModalContent={UserManagement}
+                  />
+                </>
+              )}
 
             {user.role.permissions.some(
               (perm) => perm.permission === "edit roles"
             ) && (
-              <>
-                <ListItemButton sx={{ pl: 5 }} onClick={openRoleModal}>
-                  <ListItemIcon>
-                    <LockOpen sx={{ color: "white" }} fontSize="medium" />
-                  </ListItemIcon>
-                  <ListItemText>
-                    <Typography fontSize={16}>Roles</Typography>
-                  </ListItemText>
-                </ListItemButton>
-                <FullModal
-                  open={roleModalOpen}
-                  modalTitle={"Roles & Permissions"}
-                  updateOpenValue={setRoleModalOpen}
-                  ModalContent={RolesPermissionsManager}
-                />
-              </>
-            )}
+                <>
+                  <ListItemButton sx={{ pl: 5 }} onClick={openRoleModal}>
+                    <ListItemIcon>
+                      <LockOpen sx={{ color: "white" }} fontSize="medium" />
+                    </ListItemIcon>
+                    <ListItemText>
+                      <Typography fontSize={16}>Roles</Typography>
+                    </ListItemText>
+                  </ListItemButton>
+                  <FullModal
+                    open={roleModalOpen}
+                    modalTitle={"Roles & Permissions"}
+                    updateOpenValue={setRoleModalOpen}
+                    ModalContent={RolesPermissionsManager}
+                  />
+                </>
+              )}
 
             {user.role.permissions.some(
               (perm) => perm.permission === "edit ip groups"
             ) && (
-              <>
-                <ListItemButton sx={{ pl: 5 }} onClick={openIpModal}>
-                  <ListItemIcon>
-                    <HubIcon sx={{ color: "white" }} fontSize="medium" />
-                  </ListItemIcon>
-                  <ListItemText>
-                    <Typography fontSize={16}>IP Groups</Typography>
-                  </ListItemText>
-                </ListItemButton>
-                <FullModal
-                  open={ipModalOpen}
-                  modalTitle={"IP Groups"}
-                  updateOpenValue={setIpModalOpen}
-                  ModalContent={IPGroupManager}
-                />
-              </>
-            )}
+                <>
+                  <ListItemButton sx={{ pl: 5 }} onClick={openIpModal}>
+                    <ListItemIcon>
+                      <HubIcon sx={{ color: "white" }} fontSize="medium" />
+                    </ListItemIcon>
+                    <ListItemText>
+                      <Typography fontSize={16}>IP Groups</Typography>
+                    </ListItemText>
+                  </ListItemButton>
+                  <FullModal
+                    open={ipModalOpen}
+                    modalTitle={"IP Groups"}
+                    updateOpenValue={setIpModalOpen}
+                    ModalContent={IPGroupManager}
+                  />
+                </>
+              )}
           </List>
         </Collapse>
       </List>

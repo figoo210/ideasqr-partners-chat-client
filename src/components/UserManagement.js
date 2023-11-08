@@ -28,6 +28,12 @@ const UserManagement = () => {
     role_name: "",
   });
 
+  // Search
+  const [searchTerm, setSearchTerm] = useState("");
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
   const handleOpen = (user) => {
     setSelectedUser(user);
     setFormValues({
@@ -72,9 +78,21 @@ const UserManagement = () => {
     setUsers(users.filter((user) => user.id !== id));
   };
 
+  const filteredUsers = users && users.length > 0 && users.filter((user) => {
+    const nameMatch = user.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const emailMatch = user.email.toLowerCase().includes(searchTerm.toLowerCase());
+    return nameMatch || emailMatch;
+  });
+
   return (
     <div>
       <TableContainer component={Paper}>
+        <TextField
+          label="Search by Name or Email ...."
+          value={searchTerm}
+          onChange={handleSearchChange}
+          sx={{ width: "90%", margin: "auto", mt: 2, position: "absolute", left: 0, right: 0 }}
+        />
         <Table aria-label="user table">
           <TableHead>
             <TableRow>
@@ -85,7 +103,7 @@ const UserManagement = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {users.map((user) => (
+            {filteredUsers && filteredUsers.length > 0 && filteredUsers.map((user) => (
               <TableRow key={user.id}>
                 <TableCell component="th" scope="row">
                   {user.name}

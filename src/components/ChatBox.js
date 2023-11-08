@@ -4,7 +4,7 @@ import SendMessage from "./SendMessage";
 import api from "../services/api";
 import { AuthContext } from "../services/AuthContext";
 import { Box, Button, Popper, Typography } from "@mui/material";
-import { getOtherChatUserId, generateRandomString, updateMessagesWithMessage, updateMessageReactions } from "../services/helper";
+import { getOtherChatUserId, generateRandomString, updateMessagesWithMessage, updateMessageReactions, updateEditedMessagesWithMessage } from "../services/helper";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { VideoCallOutlined } from "@mui/icons-material";
 
@@ -112,6 +112,11 @@ const ChatBox = (props) => {
       if (msg.hasOwnProperty("reaction")) {
         if (props.currentChat === msg.chat_id) {
           let updatedMessages = updateMessageReactions(messages, msg.reaction);
+          setMessages(updatedMessages);
+        }
+      } else if (msg.hasOwnProperty("edit")) {
+        if (props.currentChat === msg.chat_id) {
+          let updatedMessages = updateEditedMessagesWithMessage(messages, msg);
           setMessages(updatedMessages);
         }
       } else {

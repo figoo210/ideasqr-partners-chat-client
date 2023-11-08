@@ -32,6 +32,7 @@ export default function CustomModal(props) {
             <props.ModalContent
               closeModal={handleClose}
               getAddedData={props.getAddedData}
+              usersData={props.usersData}
             />
           ) : (
             ""

@@ -31,6 +31,10 @@ function AddUser(props) {
     return isValid;
   };
 
+  const emailExistsInUsersData = (email) => {
+    return props.usersData.some((user) => user.email === email);
+  };
+
   const validatePassword = (password) => {
     const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
     let isValid = passwordRegex.test(password);
@@ -49,6 +53,10 @@ function AddUser(props) {
     event.preventDefault();
     // Handle form submission here
     if (!validateEmail(email) || !validatePassword(password)) {
+      return;
+    }
+
+    if (emailExistsInUsersData(email)) {
       return;
     }
 
@@ -100,8 +108,8 @@ function AddUser(props) {
             onChange={(event) => setEmail(event.target.value)}
             margin="normal"
             required
-            error={!validateEmail(email)}
-            helperText={!validateEmail(email) ? "Invalid email format" : ""}
+            error={!validateEmail(email) || emailExistsInUsersData(email)}
+            helperText={!validateEmail(email) ? "Invalid email format" : (emailExistsInUsersData(email) ? "Email already exist" : "")}
           />
         </Box>
         <Box sx={{ width: "100%", display: "flex" }}>

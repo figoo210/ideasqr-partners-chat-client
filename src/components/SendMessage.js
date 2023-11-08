@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Box, Button } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import { AuthContext } from "../services/AuthContext";
@@ -39,6 +39,28 @@ const SendMessage = ({ scroll, chatId, sendTestMsg }) => {
     setBtnDisabled(true);
     scroll.current.scrollIntoView({ behavior: "smooth" });
   };
+
+  useEffect(() => {
+    const handleKeyPress = (event) => {
+      const shortcuts = user.data.reply_shortcuts;
+      const inputField = document.querySelector(".react-input-emoji--input");
+      if (event.ctrlKey) {
+        for (let i = 1; i <= 9; i++) {
+          if (event.key === `${i}`) {
+            setMessage(shortcuts[i - 1].reply);
+            inputField && inputField.focus();
+          }
+        }
+      }
+    };
+    // Attach the event listener when the component mounts
+    document.addEventListener('keydown', handleKeyPress);
+
+    // Remove the event listener when the component unmounts
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [])
 
   return (
     <form

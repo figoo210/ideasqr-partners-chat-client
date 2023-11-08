@@ -142,6 +142,20 @@ export const updateMessagesWithMessage = (array, object, temp_id) => {
   return array; // Return the modified array
 }
 
+export const updateEditedMessagesWithMessage = (array, object) => {
+  const index = array.findIndex(item => item.id === object.id);
+
+  if (index !== -1) {
+    // If the object with the same ID exists, replace it
+    array[index] = object;
+  } else {
+    // If the object with the same ID doesn't exist, add it to the end of the array
+    array.push(object);
+  }
+
+  return array; // Return the modified array
+}
+
 export const updateMessageReactions = (array, object) => {
   const messageId = object.message_id;
   const index = array.findIndex(item => item.id === messageId);
