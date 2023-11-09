@@ -13,11 +13,16 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import api from "../services/api";
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
+  const [roles, setRoles] = useState([]);
   const [open, setOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState({});
   const [formValues, setFormValues] = useState({
@@ -71,6 +76,15 @@ const UserManagement = () => {
     api.getUsers().then((response) => {
       setUsers(response.data);
     });
+    // Get Roles
+    api
+      .getRoles()
+      .then((response) => {
+        setRoles(response.data);
+      })
+      .catch((error) => {
+        console.log("Error: ", error);
+      });
   }, []);
 
   const handleDelete = async (id) => {
@@ -159,15 +173,22 @@ const UserManagement = () => {
               fullWidth
               margin="normal"
             />
-            <TextField
-              label="Role"
-              name="role_name"
-              value={formValues.role_name}
-              onChange={handleFormChange}
-              fullWidth
-              margin="normal"
-              required
-            />
+            <FormControl margin="normal" sx={{ flex: 1, mx: 1 }} fullWidth>
+              <InputLabel id="demo-simple-select-label">Role</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={formValues.role_name}
+                label="Role"
+                name="role_name"
+                required
+                onChange={handleFormChange}
+              >
+                {roles && roles.map((r, idx) => (
+                  <MenuItem selected={formValues.role_name === r.role ? true : false} key={idx} value={r.role}>{r.role}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </form>
         </DialogContent>
         <DialogActions>

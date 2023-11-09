@@ -80,7 +80,7 @@ export default function ChatList(props) {
   };
 
   const filteredChats = sortChats && sortedChats.length > 0 && sortedChats.filter((chat) => {
-    if (props.searchField && props.searchField.length > 0) {
+    if (props.searchField && props.searchField.length > 0 && getChatName(chat)) {
       return getChatName(chat).toLowerCase().includes(props.searchField.toLowerCase());
     } else {
       return true;
