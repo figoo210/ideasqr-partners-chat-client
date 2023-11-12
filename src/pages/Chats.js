@@ -26,6 +26,7 @@ function Chats(props) {
 
   const [currentChat, setCurrentChat] = useState(null);
   const [updateChats, setUpdateChats] = useState(null);
+  const [updateAllData, setUpdateAllData] = useState(null);
 
   const [usersModalOpen, setUsersModalOpen] = useState(false);
   const [addGroupOpen, setAddGroupOpen] = useState(false);
@@ -96,7 +97,7 @@ function Chats(props) {
 
   useEffect(() => {
     getData();
-  }, []);
+  }, [updateAllData]);
 
   useEffect(() => {
     updateLists();
@@ -251,6 +252,7 @@ function Chats(props) {
               data={data}
               usersData={usersData}
               updateChats={setUpdateChats}
+              setUpdateAllData={setUpdateAllData}
               makeCallWith={props.makeCallWith}
             />
           </Box>

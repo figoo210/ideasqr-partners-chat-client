@@ -39,11 +39,14 @@ export default function MultipleSelectChip(props) {
     api.getUsers().then((response) => {
       setUsersData(response.data);
     });
+    if (props.members && props.members.length > 0) {
+      setPersonName(props.members);
+    }
   }, []);
 
   return (
     <div>
-      <FormControl sx={{ flex: 1, mx: 1, width: 300, mt: 2 }}>
+      <FormControl sx={{ flex: 1, mx: 1, width: props.width || 300, mt: 2 }}>
         <InputLabel id="demo-multiple-chip-label">Members</InputLabel>
         <Select
           labelId="demo-multiple-chip-label"

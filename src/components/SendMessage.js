@@ -9,9 +9,11 @@ const SendMessage = ({ scroll, chatId, sendTestMsg }) => {
   const { user } = useContext(AuthContext);
 
   const [message, setMessage] = useState("");
+  const [shortcutMessage, setShortcutMessage] = useState("");
   const [isBtnDisabled, setBtnDisabled] = useState(true);
 
-  const messageHandler = (text) => {
+  const messageHandler = (t) => {
+    let text = document.querySelector(".react-input-emoji--input")?.textContent;
     if (text.trim() === "" || !text) {
       setBtnDisabled(true);
     } else {
@@ -21,7 +23,14 @@ const SendMessage = ({ scroll, chatId, sendTestMsg }) => {
   };
 
   const onEnter = (e) => {
-    sendMessages();
+    const handleEnterPress = (event) => {
+      if (event.shiftKey && event.key === "Enter") {
+        // Nothing
+      } else if (event.key === "Enter") {
+        sendMessages();
+      }
+    };
+    document.addEventListener('keydown', handleEnterPress);
   };
 
   const sendMessages = async () => {
@@ -41,14 +50,18 @@ const SendMessage = ({ scroll, chatId, sendTestMsg }) => {
   };
 
   useEffect(() => {
+    function getFocusedInput(m) {
+      const focusedElement = document.activeElement;
+      if (focusedElement.tagName !== 'INPUT') {
+        setMessage(m);
+      }
+    }
     const handleKeyPress = (event) => {
       const shortcuts = user.data.reply_shortcuts;
-      const inputField = document.querySelector(".react-input-emoji--input");
       if (event.ctrlKey) {
         for (let i = 1; i <= 9; i++) {
           if (event.key === `${i}`) {
-            setMessage(shortcuts[i - 1].reply);
-            inputField && inputField.focus();
+            getFocusedInput(shortcuts[i - 1].reply);
           }
         }
       }

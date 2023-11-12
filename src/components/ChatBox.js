@@ -3,10 +3,11 @@ import Message from "./Message";
 import SendMessage from "./SendMessage";
 import api from "../services/api";
 import { AuthContext } from "../services/AuthContext";
-import { Box, Button, Popper, Typography } from "@mui/material";
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Popper, Tooltip, Typography } from "@mui/material";
 import { getOtherChatUserId, generateRandomString, updateMessagesWithMessage, updateMessageReactions, updateEditedMessagesWithMessage } from "../services/helper";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { VideoCallOutlined } from "@mui/icons-material";
+import MultipleSelectChip from "./MultiSelect";
 
 
 let tempMessageId = Math.random();
@@ -21,12 +22,19 @@ const ChatBox = (props) => {
 
   const scroll = useRef();
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const handlePoper = (event) => {
-    setAnchorEl(anchorEl ? null : event.currentTarget);
+
+  const [openDialog, setOpenDialog] = useState(false);
+
+  const handleOpenDialog = () => {
+    if (user.role.role === "admin") {
+      setOpenDialog(true);
+    }
   };
-  const openPoper = Boolean(anchorEl);
-  const id = openPoper ? "simple-popper" : undefined;
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    sendJsonMessage({ update_chat_members: "update_chat_members", chat_id: props.currentChat, uuid: Math.random() });
+  };
 
   // WebSocket
   const socketUrl = process.env.REACT_APP_WEBSOCKET_URL;
@@ -119,6 +127,8 @@ const ChatBox = (props) => {
           let updatedMessages = updateEditedMessagesWithMessage(messages, msg);
           setMessages(updatedMessages);
         }
+      } else if (msg.hasOwnProperty("update_chat_members")) {
+        props.setUpdateAllData(Math.random());
       } else {
         if (props.currentChat === msg.chat_id) {
           let updatedMessages = updateMessagesWithMessage(messages, msg, tempMessageId);
@@ -130,6 +140,17 @@ const ChatBox = (props) => {
     }
   }, [lastJsonMessage]);
 
+
+  const updateGroupMembers = (m) => {
+    api.updateChatMembers({
+      chat_id: props.currentChat,
+      user_ids: m
+    }).then((r) => {
+      setMembers(r.data.chat_members);
+    }).catch((e) => {
+      console.log(e);
+    })
+  }
 
 
   const handleClickSendMessage = (msg) => {
@@ -197,39 +218,43 @@ const ChatBox = (props) => {
             {chatDisplayName}
             {members.length > 0 && (
               <>
-                <Typography
-                  variant="body1"
-                  fontWeight={500}
-                  fontSize={18}
-                  color="GrayText"
-                  onClick={handlePoper}
-                  sx={{ cursor: "pointer", borderBottom: "1px solid grey" }}
-                >
-                  {members.length} Members
-                </Typography>
-                <Popper id={id} open={openPoper} anchorEl={anchorEl} sx={{ zIndex: 999 }}>
-                  <Box
-                    sx={{
-                      border: 1,
-                      p: 3,
-                      bgcolor: "background.paper",
-                    }}
-                  >
-                    {members.map((member, idx) => (
-                      <Box key={idx}>
-                        {props.usersData.map((user, idx) => (
-                          <Typography
-                            color="darkblue"
-                            variant="body1"
-                            key={idx}
-                          >
-                            {user.id === member.user_id && user.name}
-                          </Typography>
-                        ))}
-                      </Box>
+                <Tooltip title={members.map((member, idx) => (
+                  <Box key={idx}>
+                    {props.usersData.map((user, idx) => (
+                      <Typography color="darkblue" variant="body1" key={idx}>
+                        {user.id === member.user_id && user.name}
+                      </Typography>
                     ))}
                   </Box>
-                </Popper>
+                ))}>
+                  <Typography
+                    variant="body1"
+                    fontWeight={500}
+                    fontSize={18}
+                    color="GrayText"
+                    onClick={handleOpenDialog}
+                    sx={{ cursor: "pointer", borderBottom: "1px solid grey" }}
+                  >
+                    {members.length} Members
+                  </Typography>
+                </Tooltip>
+                <Dialog open={openDialog} onClose={handleCloseDialog}>
+                  <DialogTitle>Group Members</DialogTitle>
+                  <DialogContent>
+                    <Box
+                      sx={{
+                        border: 0,
+                        bgcolor: "background.paper",
+                        width: 500,
+                      }}
+                    >
+                      <MultipleSelectChip width={"100%"} members={members.map(obj => obj.user_id)} getMembers={updateGroupMembers} />
+                    </Box>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={handleCloseDialog}>Done</Button>
+                  </DialogActions>
+                </Dialog>
               </>
             )}
           </Typography>

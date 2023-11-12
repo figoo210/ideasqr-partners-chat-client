@@ -27,19 +27,23 @@ const Welcome = () => {
 
   const onLogin = async (e) => {
     e.preventDefault();
-    axios
-    .get("https://ipinfo.io/json")
-    .then((response) => response.data)
-    .then((data) => {
-      const ipAddress = data.ip;
-      login(email, password, ipAddress).catch((e) => {
-        setIsError(true);
-        setError(e.response.data.detail);
-      });
-    })
-    .catch((error) => {
-      console.error("Error:", error);
+    login(email, password, "ipAddress").catch((e) => {
+      setIsError(true);
+      setError(e.response.data.detail);
     });
+    // axios
+    // .get("https://ipinfo.io/json")
+    // .then((response) => response.data)
+    // .then((data) => {
+    //   const ipAddress = data.ip;
+    //   login(email, password, ipAddress).catch((e) => {
+    //     setIsError(true);
+    //     setError(e.response.data.detail);
+    //   });
+    // })
+    // .catch((error) => {
+    //   console.error("Error:", error);
+    // });
   };
 
   return (

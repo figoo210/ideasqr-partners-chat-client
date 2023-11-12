@@ -122,7 +122,9 @@ input {
   color: #1c2c4c;
 }
 .user-message {
-  word-break: break-all;
+  word-break: normal;
+  white-space: pre-wrap;
+  max-width: 100%;
 }
 .message-time {
   display: block;
@@ -331,6 +333,11 @@ input {
   width: 100%;
   padding: 0px 10px 0px;
   text-align: left;
+  overflow-y: auto;
+  outline: none;
+  resize: vertical;
+  white-space: pre-wrap;
+  word-break: normal;
 }
 .css-1jd4zsf-MuiFormControl-root-MuiTextField-root {
   margin-bottom: 10px !important;

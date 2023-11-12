@@ -83,6 +83,8 @@ function Home() {
           let n = notifyReaction(user.data.id, call, allUsers, allGroups); // Notification
           setNotification(n);
           n && openNotification();
+        } else if (call.hasOwnProperty("update_chat_members")) {
+          // console.log("update_chat_members");
         } else {
           let n = notifyMessage(user.data.id, call, allUsers, allGroups); // Notification
           setNotification(n);

@@ -146,6 +146,10 @@ export default {
     return Api.put(`/messages/${id}`, message);
   },
 
+  updateChatMembers: (members) => {
+    return Api.post(`/update-chat-members`, members);
+  },
+
   chatMessages: (id) => {
     return Api.get(`/chat/messages/${id}`);
   },

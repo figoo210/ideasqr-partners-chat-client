@@ -31,6 +31,32 @@ export default function ReplyPopover(props) {
     setAnchorEl(null);
   };
 
+  React.useEffect(() => {
+    function getFocusedInput(m) {
+      const focusedElement = document.activeElement;
+      if (focusedElement.tagName === 'INPUT') {
+        setReply(m);
+      }
+    }
+    const handleKeyPress = (event) => {
+      const shortcuts = user.data.reply_shortcuts;
+      if (event.ctrlKey) {
+        for (let i = 1; i <= 9; i++) {
+          if (event.key === `${i}`) {
+            getFocusedInput(shortcuts[i - 1].reply);
+          }
+        }
+      }
+    };
+    // Attach the event listener when the component mounts
+    document.addEventListener('keydown', handleKeyPress);
+
+    // Remove the event listener when the component unmounts
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [])
+
   return (
     <div style={props.style}>
       <Button aria-describedby={id} variant="text" onClick={handleClick}>
