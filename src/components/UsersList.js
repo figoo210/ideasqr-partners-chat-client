@@ -20,7 +20,7 @@ export default function UsersList(props) {
 
   const filteredChats = props.data && props.data.length > 0 && props.data.filter((chat) => {
     if (props.searchField && props.searchField.length > 0) {
-      return chat.name.toLowerCase().includes(props.searchField.toLowerCase());
+      return chat.hasOwnProperty("name") && chat?.name.toLowerCase().includes(props.searchField.toLowerCase());
     } else {
       return true;
     }

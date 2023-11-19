@@ -128,12 +128,13 @@ const ChatBox = (props) => {
           setMessages(updatedMessages);
         }
       } else if (msg.hasOwnProperty("update_chat_members")) {
-        props.setUpdateAllData(Math.random());
+        // props.setUpdateAllData(Math.random());
       } else {
         if (props.currentChat === msg.chat_id) {
           let updatedMessages = updateMessagesWithMessage(messages, msg, tempMessageId);
           tempMessageId = Math.random();
           setMessages(updatedMessages);
+          props.setUpdateChatNotification(msg);
         }
       }
       msg?.chat_id && props.updateChats([msg.chat_id, Math.random()]);

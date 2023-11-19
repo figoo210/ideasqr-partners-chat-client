@@ -26,6 +26,7 @@ function Chats(props) {
 
   const [currentChat, setCurrentChat] = useState(null);
   const [updateChats, setUpdateChats] = useState(null);
+  const [updateChatNotification, setUpdateChatNotification] = useState(null);
   const [updateAllData, setUpdateAllData] = useState(null);
 
   const [usersModalOpen, setUsersModalOpen] = useState(false);
@@ -116,9 +117,10 @@ function Chats(props) {
           setGChats(d);
         } else {
           let d = updateChatsWithChat(dChats, singleChat);
-          setDChats(d)
+          setDChats(d);
         }
-      })
+      });
+
     }
   }, [updateChats]);
 
@@ -235,6 +237,7 @@ function Chats(props) {
                   data={data}
                   usersData={usersData}
                   searchField={searchField}
+                  updateChatNotification={updateChatNotification}
                 />
               )}
               {props.page === "Contact List" && (
@@ -253,6 +256,7 @@ function Chats(props) {
               usersData={usersData}
               updateChats={setUpdateChats}
               setUpdateAllData={setUpdateAllData}
+              setUpdateChatNotification={setUpdateChatNotification}
               makeCallWith={props.makeCallWith}
             />
           </Box>

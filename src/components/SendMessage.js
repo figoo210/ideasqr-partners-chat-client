@@ -13,7 +13,7 @@ const SendMessage = ({ scroll, chatId, sendTestMsg }) => {
   const [isBtnDisabled, setBtnDisabled] = useState(true);
 
   const messageHandler = (t) => {
-    let text = document.querySelector(".react-input-emoji--input")?.textContent;
+    let text = t; // document.querySelector(".react-input-emoji--input")?.textContent;
     if (text.trim() === "" || !text) {
       setBtnDisabled(true);
     } else {
@@ -23,14 +23,7 @@ const SendMessage = ({ scroll, chatId, sendTestMsg }) => {
   };
 
   const onEnter = (e) => {
-    const handleEnterPress = (event) => {
-      if (event.shiftKey && event.key === "Enter") {
-        // Nothing
-      } else if (event.key === "Enter") {
-        sendMessages();
-      }
-    };
-    document.addEventListener('keydown', handleEnterPress);
+    sendMessages();
   };
 
   const sendMessages = async () => {

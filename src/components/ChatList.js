@@ -24,8 +24,11 @@ export default function ChatList(props) {
   const [sortedChats, setSortedChats] = React.useState([]);
 
   // Function to sort chats based on the last message
-  const sortChats = () => {
-    const sorted = [...props.data];
+  const sortChats = (d) => {
+    let sorted = [...props.data];
+    if (d) {
+      sorted = d;
+    }
     sorted.sort((a, b) => {
       const aLastMessage = a.messages ? a.messages[a.messages.length - 1] : null;
       const bLastMessage = b.messages ? b.messages[b.messages.length - 1] : null;
@@ -49,7 +52,7 @@ export default function ChatList(props) {
     if (props.data) {
       sortChats();
     }
-  }, [props.data, props.searchField]);
+  }, [props.data, props.searchField, props.updateChatNotification]);
 
   const getChatName = (chat) => {
     if (!chat.is_group && props.usersData && chat.chat_name) {
@@ -65,6 +68,7 @@ export default function ChatList(props) {
   };
 
   const getClicked = (e) => {
+    sortChats();
     props.getChat(e.currentTarget.id);
     for (let i = 0; i < props?.data.length; i++) {
       const element = props?.data[i];
@@ -86,6 +90,21 @@ export default function ChatList(props) {
       return true;
     }
   });
+
+  // React.useEffect(() => {
+  //   if (props.updateChatNotification) {
+  //     if (sortedChats && sortedChats.length > 0) {
+  //       console.log("here ---------");
+  //       let d = sortedChats;
+  //       let chatIndex = d.findIndex(obj => obj.chat_name === props.updateChatNotification.chat_id);
+  //       if (chatIndex !== -1) {
+  //         d[chatIndex].messages.push(props.updateChatNotification);
+  //         console.log(d);
+  //         sortChats(d);
+  //       }
+  //     }
+  //   }
+  // }, [props.updateChatNotification]);
 
   return (
     <List
@@ -128,7 +147,10 @@ export default function ChatList(props) {
               </ListItemAvatar>
               <ListItemText
                 primary={getChatName(d)}
-                secondary={d.messages ? shortenString(getLatestMessage(d.messages), 20) : ""}
+                secondary={
+                  d.messages ? shortenString(props.updateChatNotification?.chat_id === d?.chat_name && props.updateChatNotification?.message
+                    || getLatestMessage(d.messages), 20) : ""
+                }
               />
               <Box
                 mt={1}
