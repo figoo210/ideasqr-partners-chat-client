@@ -1,5 +1,5 @@
-import { Box, Button, Popover, Typography } from '@mui/material'
-import React, { useContext, useState } from 'react'
+import { Box, Button, Popover, Typography } from '@mui/material';
+import React, { useContext, useState } from 'react';
 import InsertEmoticonIcon from "@mui/icons-material/InsertEmoticon";
 import ReplyPopover from './ReplyPopover';
 import api from '../services/api';

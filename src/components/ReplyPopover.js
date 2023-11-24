@@ -2,7 +2,6 @@ import * as React from "react";
 import { Box, TextField, Popover, Button } from "@mui/material";
 import { SendOutlined } from "@mui/icons-material";
 import { AuthContext } from "../services/AuthContext";
-// import InputEmoji from "react-input-emoji";
 
 export default function ReplyPopover(props) {
   const { user } = React.useContext(AuthContext);
