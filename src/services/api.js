@@ -6,6 +6,7 @@ Api.interceptors.request.use((config) => {
   const token = localStorage.getItem("user");
   if (token) {
     config.headers.Authorization = `Bearer ${JSON.parse(token).access_token}`;
+    config.headers.set("USER_ID", JSON.parse(token).data.id);
   }
 
   return config;
@@ -127,6 +128,14 @@ export default {
   // Get Chats
   getChats: () => {
     return Api.get("/chats/");
+  },
+
+  getDirectChats: () => {
+    return Api.get("/direct-chats/");
+  },
+
+  getGroupChats: () => {
+    return Api.get("/group-chats/");
   },
 
   getChatById: (chat_id) => {

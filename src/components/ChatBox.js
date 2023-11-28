@@ -137,7 +137,7 @@ const ChatBox = (props) => {
           props.setUpdateChatNotification(msg);
         }
       }
-      msg?.chat_id && props.updateChats([msg.chat_id, Math.random()]);
+      msg?.chat_id && props.updateChats([msg, Math.random()]);
     }
   }, [lastJsonMessage]);
 

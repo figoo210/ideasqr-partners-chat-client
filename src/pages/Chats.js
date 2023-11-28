@@ -27,7 +27,6 @@ function Chats(props) {
   const [currentChat, setCurrentChat] = useState(null);
   const [updateChats, setUpdateChats] = useState(null);
   const [updateChatNotification, setUpdateChatNotification] = useState(null);
-  const [updateAllData, setUpdateAllData] = useState(null);
 
   const [usersModalOpen, setUsersModalOpen] = useState(false);
   const [addGroupOpen, setAddGroupOpen] = useState(false);
@@ -55,29 +54,24 @@ function Chats(props) {
   };
 
   const getData = async () => {
-    api.getUsers().then((response) => {
-      props.getAllUsers(response.data);
-      setUsersData(response.data);
-    });
-
-    api.getChats().then((response) => {
-      let groupChats = [];
-      let directChats = [];
-      response.data.forEach((element) => {
-        if (element.is_group) {
-          groupChats.push(element);
-        } else {
-          directChats.push(element);
-        }
-      });
-      props.getAllGroups(groupChats)
-      setDChats(directChats);
-      setGChats(groupChats);
-      return { directChats: directChats, groupChats: groupChats };
-    }).then((r) => {
+    try {
+      const [usersResponse, directChatsResponse, groupChatsResponse] = await Promise.all([
+        api.getUsers(),
+        api.getDirectChats(),
+        api.getGroupChats(),
+      ]);
       setIsLoading(false);
-      updateLists(r);
-    });
+      props.getAllUsers(usersResponse.data);
+      setUsersData(usersResponse.data);
+
+      props.getAllGroups(groupChatsResponse.data);
+      setDChats(directChatsResponse.data);
+      setGChats(groupChatsResponse.data);
+      setData(directChatsResponse.data);
+    } catch (error) {
+      // Handle error
+      console.error("Error fetching data:", error);
+    }
   };
 
   const updateLists = (d) => {
@@ -97,29 +91,22 @@ function Chats(props) {
   }
 
   useEffect(() => {
-    getData();
-  }, [updateAllData]);
-
-  useEffect(() => {
     updateLists();
   }, [props.page]);
 
   useEffect(() => {
     if (updateChats) {
-      api.getChatById(updateChats[0]).then((response) => {
-        const singleChat = response.data;
-        if (currentChat === singleChat.chat_name) {
-          let d = updateChatsWithChat(data, singleChat);
-          setData(d);
-        }
-        if (singleChat.is_group) {
-          let d = updateChatsWithChat(gChats, singleChat);
-          setGChats(d);
-        } else {
-          let d = updateChatsWithChat(dChats, singleChat);
-          setDChats(d);
-        }
-      });
+      if (currentChat === updateChats[0].chat_id) {
+        let d = updateChatsWithChat(data, updateChats[0].chat);
+        setData(d);
+      }
+      if (updateChats[0].chat.is_group) {
+        let d = updateChatsWithChat(gChats, updateChats[0].chat);
+        setGChats(d);
+      } else {
+        let d = updateChatsWithChat(dChats, updateChats[0].chat);
+        setDChats(d);
+      }
 
     }
   }, [updateChats]);
@@ -131,7 +118,7 @@ function Chats(props) {
           height={"auto"}
           sx={{ width: "82%", backgroundColor: "#f0f1f5" }}
         >
-          <Loading />
+          <Loading onLoad={getData} />
         </Box>
       ) : (props.page === "" ? (
         <Box
@@ -255,7 +242,6 @@ function Chats(props) {
               data={data}
               usersData={usersData}
               updateChats={setUpdateChats}
-              setUpdateAllData={setUpdateAllData}
               setUpdateChatNotification={setUpdateChatNotification}
               makeCallWith={props.makeCallWith}
             />
