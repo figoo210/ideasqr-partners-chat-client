@@ -95,7 +95,7 @@ function Chats(props) {
   }, [props.page]);
 
   useEffect(() => {
-    if (updateChats) {
+    if (updateChats && updateChats[0].hasOwnProperty("chat")) {
       if (currentChat === updateChats[0].chat_id) {
         let d = updateChatsWithChat(data, updateChats[0].chat);
         setData(d);
@@ -107,7 +107,26 @@ function Chats(props) {
         let d = updateChatsWithChat(dChats, updateChats[0].chat);
         setDChats(d);
       }
-
+    }
+    if (updateChats &&
+      (updateChats[0].hasOwnProperty("reaction") ||
+        updateChats[0].hasOwnProperty("edit") ||
+        updateChats[0].hasOwnProperty("update_chat_members"))
+    ) {
+      api.getChatById(updateChats[0].chat_id).then((response) => {
+        const singleChat = response.data;
+        if (currentChat === singleChat.chat_name) {
+          let d = updateChatsWithChat(data, singleChat);
+          setData(d);
+        }
+        if (singleChat.is_group) {
+          let d = updateChatsWithChat(gChats, singleChat);
+          setGChats(d);
+        } else {
+          let d = updateChatsWithChat(dChats, singleChat);
+          setDChats(d);
+        }
+      });
     }
   }, [updateChats]);
 

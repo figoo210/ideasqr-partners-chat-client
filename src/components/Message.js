@@ -67,7 +67,7 @@ const Message = (props) => {
       setReactions(props?.message.reactions);
 
     }
-  }, [props.message, reactions]);
+  }, [props.message]);
 
   const displayMessage = (msg) => {
     if (msg.includes("https://") || msg.includes("http://")) {
