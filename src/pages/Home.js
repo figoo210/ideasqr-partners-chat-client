@@ -41,10 +41,11 @@ function Home() {
     setPage(value);
   };
 
-  // Caller WebSocket
-  const socketUrl = process.env.REACT_APP_WEBSOCKET_URL_CALLS;
+  // WebSocket
+  const socketUrl = process.env.REACT_APP_WEBSOCKET_URL;
   const { sendJsonMessage, lastJsonMessage, readyState } =
     useWebSocket(socketUrl);
+  const [lastMessage, setLastMessage] = useState(null);
 
   const connectionStatus = {
     [ReadyState.CONNECTING]: "Connecting",
@@ -59,8 +60,22 @@ function Home() {
       from: fromUser,
       to: toListOfUsers,
       meeting: meetingInfo,
+      type: "meeting"
     };
     sendJsonMessage(call);
+  };
+
+  const updateGroupMembers = (chat_name) => {
+    sendJsonMessage({
+      type: "update_chat_members",
+      update_chat_members: "update_chat_members",
+      chat_id: chat_name,
+      uuid: Math.random()
+    });
+  };
+
+  const messageSender = (msg) => {
+    sendJsonMessage(msg);
   };
 
   useEffect(() => {
@@ -76,32 +91,32 @@ function Home() {
 
   useEffect(() => {
     if (lastJsonMessage) {
-      const call = JSON.parse(lastJsonMessage);
-      if (!call.hasOwnProperty("meeting")) {
-        // Notification
-        if (call.hasOwnProperty("reaction")) {
-          let n = notifyReaction(user.data.id, call, allUsers, allGroups); // Notification
-          setNotification(n);
-          n && openNotification();
-        } else if (call.hasOwnProperty("update_chat_members")) {
-          // console.log("update_chat_members");
-        } else {
-          let n = notifyMessage(user.data.id, call, allUsers, allGroups); // Notification
-          setNotification(n);
-          n && openNotification();
+      const resp = JSON.parse(lastJsonMessage);
+
+      if (resp.type === "reaction") {
+        let n = notifyReaction(user.data.id, resp, allUsers, allGroups); // Notification
+        setNotification(n);
+        n && openNotification();
+      }
+
+      if (resp.type === "message") {
+        let n = notifyMessage(user.data.id, resp, allUsers, allGroups); // Notification
+        setNotification(n);
+        n && openNotification();
+      }
+
+      if (resp.type === "meeting") {
+        // console.log(resp);
+        setCallerUser(resp?.from);
+        setMeeting(resp?.meeting);
+
+        if (resp?.from && resp?.from.id === user.data.id) {
+          setIsMeeting(true);
         }
-        return;
-      }
-      // console.log(call);
-      setCallerUser(call?.from);
-      setMeeting(call?.meeting);
 
-      if (call?.from && call?.from.id === user.data.id) {
-        setIsMeeting(true);
-      }
-
-      if (call?.to && call?.to.includes(user.data.id)) {
-        handleIncomingCall();
+        if (resp?.to && resp?.to.includes(user.data.id)) {
+          handleIncomingCall();
+        }
       }
     }
   }, [lastJsonMessage, user.data.id]);
@@ -178,7 +193,15 @@ function Home() {
       >
         <NavBar getPage={getPage} />
       </Box>
-      <Chats page={page} makeCallWith={makeCallWith} getAllUsers={setAllUsers} getAllGroups={setAllGroups} />
+      <Chats
+        page={page}
+        makeCallWith={makeCallWith}
+        getAllUsers={setAllUsers}
+        getAllGroups={setAllGroups}
+        updateGroupMembers={updateGroupMembers}
+        messageSender={messageSender}
+        lastMessage={lastMessage}
+      />
     </Box>
   );
 }

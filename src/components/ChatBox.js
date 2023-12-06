@@ -33,21 +33,8 @@ const ChatBox = (props) => {
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
-    sendJsonMessage({ update_chat_members: "update_chat_members", chat_id: props.currentChat, uuid: Math.random() });
+    props.updateGroupMembersWebsocket(props.currentChat)
   };
-
-  // WebSocket
-  const socketUrl = process.env.REACT_APP_WEBSOCKET_URL;
-  const { sendJsonMessage, lastJsonMessage, readyState } =
-    useWebSocket(socketUrl);
-
-  const connectionStatus = {
-    [ReadyState.CONNECTING]: "Connecting",
-    [ReadyState.OPEN]: "Open",
-    [ReadyState.CLOSING]: "Closing",
-    [ReadyState.CLOSED]: "Closed",
-    [ReadyState.UNINSTANTIATED]: "Uninstantiated",
-  }[readyState];
 
   const getSelectedChat = useCallback((chatName) => {
     let chat = null;
@@ -80,13 +67,6 @@ const ChatBox = (props) => {
 
 
   useEffect(() => {
-    // Check web socket status
-    console.log(connectionStatus);
-    if (connectionStatus === "Closing" || connectionStatus === "Closed") {
-      console.log("Connection Closed!!!");
-      window.location.reload();
-    }
-
     // get chat room if exist and create one if not exist
     if (props.currentChat) {
       if (!getSelectedChat(props.currentChat)) {
@@ -107,16 +87,12 @@ const ChatBox = (props) => {
       }
     }
 
-  }, [props.currentChat, user.data.id, connectionStatus]);
+  }, [props.currentChat, user.data.id]);
 
 
   useEffect(() => {
     if (lastJsonMessage) {
       const msg = JSON.parse(lastJsonMessage);
-      if (msg.hasOwnProperty("meeting")) {
-        return;
-      }
-
       if (msg.hasOwnProperty("reaction")) {
         if (props.currentChat === msg.chat_id) {
           let updatedMessages = updateMessageReactions(messages, msg.reaction);
@@ -169,7 +145,7 @@ const ChatBox = (props) => {
         setMessages(prevMessages => [...prevMessages, tempMessage]);
       }
     }
-    sendJsonMessage(msg);
+    props.messageSender(msg);
   };
 
   const makeCall = () => {

@@ -263,6 +263,8 @@ function Chats(props) {
               updateChats={setUpdateChats}
               setUpdateChatNotification={setUpdateChatNotification}
               makeCallWith={props.makeCallWith}
+              updateGroupMembersWebsocket={props.updateGroupMembers}
+              messageSender={props.messageSender}
             />
           </Box>
         </>
