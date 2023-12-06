@@ -74,6 +74,7 @@ const SendMessage = ({ scroll, chatId, sendTestMsg }) => {
       chat_id: chatId,
       sender_id: user.data.id,
       message: message,
+      type: "message"
     };
     sendTestMsg(newMessage);
     setMessage("");

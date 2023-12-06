@@ -128,8 +128,8 @@ export function shortenFileName(fileName, maxLength) {
   return `${name}...${extension}`;
 }
 
-export const updateMessagesWithMessage = (array, object, temp_id) => {
-  const index = array.findIndex(item => item.id === temp_id);
+export const updateMessagesWithMessage = (array, object) => {
+  const index = array.findIndex(item => item.chat_sequance === object.chat_sequance);
 
   if (index !== -1) {
     // If the object with the same ID exists, replace it
@@ -142,41 +142,62 @@ export const updateMessagesWithMessage = (array, object, temp_id) => {
   return array; // Return the modified array
 }
 
-export const updateEditedMessagesWithMessage = (array, object) => {
-  const index = array.findIndex(item => item.id === object.id);
+export const updateUserLiveReactions = (array, object) => {
+  if (!array || array.length === 0) {
+    return [object]
+  }
+
+  const index = array.findIndex(item => item.message_id === object.message_id && item.user_id === object.user_id);
 
   if (index !== -1) {
     // If the object with the same ID exists, replace it
-    array[index] = object;
+    array[index].reaction = object.reaction;
+    array[index].last_modified_at = Date.now();
   } else {
-    // If the object with the same ID doesn't exist, add it to the end of the array
     array.push(object);
+  }
+  return array; // Return the modified array
+}
+
+export const updateChatWithMessageReactions = (array, object) => {
+  const index = array.findIndex(item => item.chat_name === object.chat_id);
+  const msgIndex = array[index].messages.findIndex(item => item.chat_sequance === object.chat_sequance);
+
+  if (msgIndex !== -1) {
+    const reactionIndex = array[index].messages[msgIndex].reactions.findIndex(item => item.user_id === object.reaction.user_id);
+    if (reactionIndex !== -1) {
+      array[index].messages[msgIndex].reactions[reactionIndex].reaction = object.reaction.reaction;
+      array[index].messages[msgIndex].reactions[reactionIndex].last_modified_at = Date.now();
+    } else {
+      array[index].messages[msgIndex].reactions.push(object.reaction);
+    }
   }
 
   return array; // Return the modified array
 }
 
-export const updateMessageReactions = (array, object) => {
-  const messageId = object.message_id;
-  const index = array.findIndex(item => item.id === messageId);
+export const updateChatWithMessage = (array, object) => {
+  const index = array.findIndex(item => item.chat_name === object.chat_id);
+  const msgIndex = array[index].messages.findIndex(item => item.chat_sequance === object.chat_sequance);
 
-  if (index !== -1) {
+  if (msgIndex !== -1) {
     // If the object with the same ID exists, replace it
-    array[index]["reactions"].push(object);
+    array[index].messages[msgIndex] = object;
+  } else {
+    // If the object with the same ID doesn't exist, add it to the end of the array
+    array[index].messages.push(object);
   }
+
   return array; // Return the modified array
 }
 
-export const updateChatsWithChat = (array, object) => {
-  const objectId = object.chat_name;
-  const index = array.findIndex(item => item.chat_name === objectId);
+
+export const updateChatGroupWithMembers = (array, object) => {
+  const index = array.findIndex(item => item.chat_name === object.chat_id);
 
   if (index !== -1) {
     // If the object with the same ID exists, replace it
-    array[index] = object;
-  } else {
-    // If the object with the same ID doesn't exist, add it to the end of the array
-    array.push(object);
+    array[index].chat_members = object.members;
   }
 
   return array; // Return the modified array

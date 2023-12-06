@@ -17,10 +17,11 @@ function EditMessage(props) {
             props.setOpen(false);
             let editedMessage = {
                 ...props.message,
-                message: updatedMessage.trim()
+                message: updatedMessage.trim(),
+                type: "edit"
             }
             api.updateMessage(props.message.id, editedMessage);
-            props.sendTestMsg({ edit: editedMessage });
+            props.sendTestMsg(editedMessage);
         }
     };
 

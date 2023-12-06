@@ -9,7 +9,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { shortenFileName, shortenString } from "../services/helper";
+import { shortenFileName, shortenString, updateUserLiveReactions } from "../services/helper";
 import { FilePresentOutlined, PlusOne } from "@mui/icons-material";
 import MessageAction from "./MessageAction";
 import CustomModal from "./Modal";
@@ -179,11 +179,7 @@ const Message = (props) => {
   };
 
   const updateLiveReaction = (r) => {
-    if (reactions) {
-      setReactions([...reactions, r]);
-    } else {
-      setReactions([r]);
-    }
+    setReactions(updateUserLiveReactions(reactions, r));
   }
 
   const handleDoubleClick = () => {
@@ -335,7 +331,7 @@ const Message = (props) => {
                         })}
                     </Box>
                     <Typography flex={2} variant="body2" mx={1}>
-                      {reaction?.created_at ? formatTime(reaction?.created_at) : formatTime(Date.now())}
+                      {reaction?.last_modified_at ? formatTime(reaction?.last_modified_at) : formatTime(Date.now())}
                     </Typography>
                     <Typography flex={1} variant="h6" mx={1}>
                       {reaction.reaction}

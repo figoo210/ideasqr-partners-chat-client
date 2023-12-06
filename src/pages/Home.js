@@ -46,6 +46,11 @@ function Home() {
   const { sendJsonMessage, lastJsonMessage, readyState } =
     useWebSocket(socketUrl);
   const [lastMessage, setLastMessage] = useState(null);
+  const [editedMessage, setEditedMessage] = useState(null);
+  const [lastReaction, setLastReaction] = useState(null);
+  const [chatGroupMembersUpdated, setChatGroupMembersUpdated] = useState(null);
+  const [newUserAdded, setNewUserAdded] = useState(null);
+  const [newGroupAdded, setNewGroupAdded] = useState(null);
 
   const connectionStatus = {
     [ReadyState.CONNECTING]: "Connecting",
@@ -65,12 +70,13 @@ function Home() {
     sendJsonMessage(call);
   };
 
-  const updateGroupMembers = (chat_name) => {
+  const updateGroupMembers = (chat_name, members) => {
     sendJsonMessage({
       type: "update_chat_members",
       update_chat_members: "update_chat_members",
       chat_id: chat_name,
-      uuid: Math.random()
+      uuid: Math.random(),
+      members: members
     });
   };
 
@@ -97,12 +103,32 @@ function Home() {
         let n = notifyReaction(user.data.id, resp, allUsers, allGroups); // Notification
         setNotification(n);
         n && openNotification();
+
+        setLastReaction(resp);
       }
 
       if (resp.type === "message") {
         let n = notifyMessage(user.data.id, resp, allUsers, allGroups); // Notification
         setNotification(n);
         n && openNotification();
+
+        setLastMessage(resp);
+      }
+
+      if (resp.type === "edit") {
+        setEditedMessage(resp);
+      }
+
+      if (resp.type === "update_chat_members") {
+        setChatGroupMembersUpdated(resp);
+      }
+
+      if (resp.type === "new_group_added") {
+        setNewGroupAdded(resp);
+      }
+
+      if (resp.type === "new_user_added") {
+        setNewUserAdded(resp);
       }
 
       if (resp.type === "meeting") {
@@ -201,6 +227,11 @@ function Home() {
         updateGroupMembers={updateGroupMembers}
         messageSender={messageSender}
         lastMessage={lastMessage}
+        editedMessage={editedMessage}
+        lastReaction={lastReaction}
+        chatGroupMembersUpdated={chatGroupMembersUpdated}
+        newUserAdded={newUserAdded}
+        newGroupAdded={newGroupAdded}
       />
     </Box>
   );

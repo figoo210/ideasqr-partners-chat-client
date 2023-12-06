@@ -182,6 +182,7 @@ function AttachmentsUpload(props) {
         sender_id: user.data.id,
         message: url,
         is_file: true,
+        type: "message"
       };
       props.sendMsg(addMessage);
     });

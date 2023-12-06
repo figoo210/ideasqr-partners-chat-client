@@ -39,7 +39,13 @@ function MessageAction(props) {
       reaction: emoji,
       message: props.message.message,
     };
-    props.sendTestMsg({ reaction: newReaction, message_id: props.message.id, chat_id: props.chatId });
+    props.sendTestMsg({
+      reaction: newReaction,
+      message_id: props.message.id,
+      chat_sequance: props.message.chat_sequance,
+      chat_id: props.chatId,
+      type: "reaction"
+    });
     api
       .reactOnMessage(newReaction)
       .then((r) => {

@@ -3,9 +3,8 @@ import Message from "./Message";
 import SendMessage from "./SendMessage";
 import api from "../services/api";
 import { AuthContext } from "../services/AuthContext";
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Popper, Tooltip, Typography } from "@mui/material";
-import { getOtherChatUserId, generateRandomString, updateMessagesWithMessage, updateMessageReactions, updateEditedMessagesWithMessage } from "../services/helper";
-import useWebSocket, { ReadyState } from "react-use-websocket";
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Tooltip, Typography } from "@mui/material";
+import { getOtherChatUserId, generateRandomString } from "../services/helper";
 import { VideoCallOutlined } from "@mui/icons-material";
 import MultipleSelectChip from "./MultiSelect";
 
@@ -33,12 +32,11 @@ const ChatBox = (props) => {
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
-    props.updateGroupMembersWebsocket(props.currentChat)
   };
 
   const getSelectedChat = useCallback((chatName) => {
     let chat = null;
-    setMessages([]);
+    // setMessages([]);
     if (props?.data) {
       props.data.forEach((c) => {
         if (c.chat_name === chatName) {
@@ -91,31 +89,22 @@ const ChatBox = (props) => {
 
 
   useEffect(() => {
-    if (lastJsonMessage) {
-      const msg = JSON.parse(lastJsonMessage);
-      if (msg.hasOwnProperty("reaction")) {
-        if (props.currentChat === msg.chat_id) {
-          let updatedMessages = updateMessageReactions(messages, msg.reaction);
-          setMessages(updatedMessages);
-        }
-      } else if (msg.hasOwnProperty("edit")) {
-        if (props.currentChat === msg.chat_id) {
-          let updatedMessages = updateEditedMessagesWithMessage(messages, msg);
-          setMessages(updatedMessages);
-        }
-      } else if (msg.hasOwnProperty("update_chat_members")) {
-        // props.setUpdateAllData(Math.random());
-      } else {
-        if (props.currentChat === msg.chat_id) {
-          let updatedMessages = updateMessagesWithMessage(messages, msg, tempMessageId);
-          tempMessageId = Math.random();
-          setMessages(updatedMessages);
-          props.setUpdateChatNotification(msg);
-        }
-      }
-      msg?.chat_id && props.updateChats([msg, Math.random()]);
+    if (props.data && props.currentChat) {
+      getSelectedChat(props.currentChat);
     }
-  }, [lastJsonMessage]);
+  }, [props.data]);
+
+
+  // useEffect(() => {
+  //   if (props.lastMessage) {
+  //     if (props.currentChat === props.lastMessage.chat_id) {
+  //       let updatedMessages = updateMessagesWithMessage(messages, props.lastMessage);
+  //       tempMessageId = Math.random();
+  //       setMessages(updatedMessages);
+  //       props.setUpdateChatNotification(props.lastMessage);
+  //     }
+  //   }
+  // }, [props.lastMessage]);
 
 
   const updateGroupMembers = (m) => {
@@ -124,6 +113,7 @@ const ChatBox = (props) => {
       user_ids: m
     }).then((r) => {
       setMembers(r.data.chat_members);
+      props.updateGroupMembersWebsocket(props.currentChat, r.data.chat_members);
     }).catch((e) => {
       console.log(e);
     })
@@ -131,11 +121,12 @@ const ChatBox = (props) => {
 
 
   const handleClickSendMessage = (msg) => {
-    if (!msg.hasOwnProperty("reaction")) {
+    if (msg.type === "message") {
       if (props.currentChat === msg.chat_id) {
         const tempMessage = {
           id: tempMessageId,
           chat_id: msg.chat_id,
+          chat_sequance: messages.length > 0 ? messages[messages.length - 1].chat_sequence + 1 : 1,
           message: msg.message,
           sender_id: msg.sender_id,
           parent_message_id: msg?.parent_message_id || 0,
@@ -144,6 +135,7 @@ const ChatBox = (props) => {
         }
         setMessages(prevMessages => [...prevMessages, tempMessage]);
       }
+      api.createMessage(msg);
     }
     props.messageSender(msg);
   };

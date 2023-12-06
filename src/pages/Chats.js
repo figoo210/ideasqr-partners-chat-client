@@ -9,9 +9,13 @@ import AddUser from "../components/AddUser";
 import AddGroup from "../components/AddGroup";
 import api from "../services/api";
 import { AuthContext } from "../services/AuthContext";
-import { updateChatsWithChat } from "../services/helper";
+import { updateChatGroupWithMembers, updateChatWithMessage, updateChatWithMessageReactions } from "../services/helper";
 import Loading from "./Loading";
 import Assets from "../assets/data";
+
+
+const pattern = /^chat-\d+-\d+$/;
+
 
 function Chats(props) {
   const { user } = React.useContext(AuthContext);
@@ -25,7 +29,6 @@ function Chats(props) {
   const [gChats, setGChats] = useState(null);
 
   const [currentChat, setCurrentChat] = useState(null);
-  const [updateChats, setUpdateChats] = useState(null);
   const [updateChatNotification, setUpdateChatNotification] = useState(null);
 
   const [usersModalOpen, setUsersModalOpen] = useState(false);
@@ -44,13 +47,17 @@ function Chats(props) {
   };
 
   const getAddedData = (d) => {
-    setData([...data, d]);
-    getData();
+    props.messageSender({
+      type: "new_group_added",
+      data: d
+    });
   };
 
   const getAddedUser = (d) => {
-    setUsersData([...usersData, d]);
-    getData();
+    props.messageSender({
+      type: "new_user_added",
+      data: d
+    });
   };
 
   const getData = async () => {
@@ -95,40 +102,83 @@ function Chats(props) {
   }, [props.page]);
 
   useEffect(() => {
-    if (updateChats && updateChats[0].hasOwnProperty("chat")) {
-      if (currentChat === updateChats[0].chat_id) {
-        let d = updateChatsWithChat(data, updateChats[0].chat);
+    if (props.lastMessage) {
+      if (currentChat === props.lastMessage.chat_id) {
+        let d = updateChatWithMessage(data, props.lastMessage);
         setData(d);
       }
-      if (updateChats[0].chat.is_group) {
-        let d = updateChatsWithChat(gChats, updateChats[0].chat);
+      if (!pattern.test(props.lastMessage.chat_id)) {
+        let d = updateChatWithMessage(gChats, props.lastMessage);
         setGChats(d);
       } else {
-        let d = updateChatsWithChat(dChats, updateChats[0].chat);
+        let d = updateChatWithMessage(dChats, props.lastMessage);
         setDChats(d);
       }
+      updateLists();
     }
-    if (updateChats &&
-      (updateChats[0].hasOwnProperty("reaction") ||
-        updateChats[0].hasOwnProperty("edit") ||
-        updateChats[0].hasOwnProperty("update_chat_members"))
-    ) {
-      api.getChatById(updateChats[0].chat_id).then((response) => {
-        const singleChat = response.data;
-        if (currentChat === singleChat.chat_name) {
-          let d = updateChatsWithChat(data, singleChat);
-          setData(d);
-        }
-        if (singleChat.is_group) {
-          let d = updateChatsWithChat(gChats, singleChat);
-          setGChats(d);
-        } else {
-          let d = updateChatsWithChat(dChats, singleChat);
-          setDChats(d);
-        }
-      });
+  }, [props.lastMessage]);
+
+  useEffect(() => {
+    if (props.editedMessage) {
+      if (currentChat === props.editedMessage.chat_id) {
+        let d = updateChatWithMessage(data, props.editedMessage);
+        setData(d);
+      }
+      if (!pattern.test(props.editedMessage.chat_id)) {
+        let d = updateChatWithMessage(gChats, props.editedMessage);
+        setGChats(d);
+      } else {
+        let d = updateChatWithMessage(dChats, props.editedMessage);
+        setDChats(d);
+      }
+      updateLists();
     }
-  }, [updateChats]);
+  }, [props.editedMessage]);
+
+  useEffect(() => {
+    if (props.lastReaction) {
+      if (currentChat === props.lastReaction.chat_id) {
+        let d = updateChatWithMessageReactions(data, props.lastReaction);
+        setData(d);
+      }
+      if (!pattern.test(props.lastReaction.chat_id)) {
+        let d = updateChatWithMessageReactions(gChats, props.lastReaction);
+        setGChats(d);
+      } else {
+        let d = updateChatWithMessageReactions(dChats, props.lastReaction);
+        setDChats(d);
+      }
+      updateLists();
+    }
+  }, [props.lastReaction]);
+
+  useEffect(() => {
+    if (props.chatGroupMembersUpdated) {
+      if (currentChat === props.chatGroupMembersUpdated.chat_id) {
+        let d = updateChatGroupWithMembers(data, props.chatGroupMembersUpdated);
+        setData(d);
+      }
+
+      let d = updateChatGroupWithMembers(gChats, props.chatGroupMembersUpdated);
+      setGChats(d);
+      updateLists();
+    }
+  }, [props.chatGroupMembersUpdated]);
+
+  useEffect(() => {
+    if (props.newUserAdded) {
+      setUsersData([...usersData, props.newUserAdded.data]);
+      updateLists();
+    }
+  }, [props.newUserAdded]);
+
+  useEffect(() => {
+    if (props.newGroupAdded) {
+      setGChats([...gChats, props.newGroupAdded.data]);
+      updateLists();
+    }
+  }, [props.newGroupAdded]);
+
 
   return (
     <>
@@ -260,7 +310,6 @@ function Chats(props) {
               currentChat={currentChat}
               data={data}
               usersData={usersData}
-              updateChats={setUpdateChats}
               setUpdateChatNotification={setUpdateChatNotification}
               makeCallWith={props.makeCallWith}
               updateGroupMembersWebsocket={props.updateGroupMembers}

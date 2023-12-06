@@ -23,6 +23,7 @@ export default function ReplyPopover(props) {
       sender_id: user.data.id,
       message: reply,
       parent_message_id: props.messageId,
+      type: "message"
     };
     props.sendTestMsg(newMessage);
     setReply("");
