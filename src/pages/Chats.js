@@ -30,6 +30,7 @@ function Chats(props) {
 
   const [currentChat, setCurrentChat] = useState(null);
   const [updateChatNotification, setUpdateChatNotification] = useState(null);
+  const [updateChatBox, setUpdateChatBox] = useState(null);
 
   const [usersModalOpen, setUsersModalOpen] = useState(false);
   const [addGroupOpen, setAddGroupOpen] = useState(false);
@@ -82,11 +83,7 @@ function Chats(props) {
   };
 
   const updateLists = (d) => {
-    if (props.page === "Contact List") {
-      if (usersData) {
-        setData(usersData);
-      }
-    } else if (props.page === "Groups") {
+    if (props.page === "Groups") {
       if (gChats) {
         setData(d ? d.groupChats : gChats);
       }
@@ -95,7 +92,18 @@ function Chats(props) {
         setData(d ? d.directChats : dChats);
       }
     }
-  }
+  };
+
+  const addChatToData = (chat) => {
+    if (chat) {
+      setData([...data, chat]);
+      if (chat.is_group) {
+        setGChats([...gChats, chat]);
+      } else {
+        setDChats([...dChats, chat]);
+      }
+    }
+  };
 
   useEffect(() => {
     updateLists();
@@ -103,79 +111,90 @@ function Chats(props) {
 
   useEffect(() => {
     if (props.lastMessage) {
-      if (currentChat === props.lastMessage.chat_id) {
-        let d = updateChatWithMessage(data, props.lastMessage);
-        setData(d);
-      }
       if (!pattern.test(props.lastMessage.chat_id)) {
         let d = updateChatWithMessage(gChats, props.lastMessage);
         setGChats(d);
+        if (currentChat === props.lastMessage.chat_id) {
+          setData(d);
+        }
       } else {
         let d = updateChatWithMessage(dChats, props.lastMessage);
         setDChats(d);
+        if (currentChat === props.lastMessage.chat_id) {
+          setData(d);
+        }
       }
       updateLists();
+      setUpdateChatBox(Math.random());
     }
   }, [props.lastMessage]);
 
   useEffect(() => {
     if (props.editedMessage) {
-      if (currentChat === props.editedMessage.chat_id) {
-        let d = updateChatWithMessage(data, props.editedMessage);
-        setData(d);
-      }
       if (!pattern.test(props.editedMessage.chat_id)) {
         let d = updateChatWithMessage(gChats, props.editedMessage);
         setGChats(d);
+        if (currentChat === props.editedMessage.chat_id) {
+          setData(d);
+        }
       } else {
         let d = updateChatWithMessage(dChats, props.editedMessage);
         setDChats(d);
+        if (currentChat === props.editedMessage.chat_id) {
+          setData(d);
+        }
       }
       updateLists();
+      setUpdateChatBox(Math.random());
     }
   }, [props.editedMessage]);
 
   useEffect(() => {
     if (props.lastReaction) {
-      if (currentChat === props.lastReaction.chat_id) {
-        let d = updateChatWithMessageReactions(data, props.lastReaction);
-        setData(d);
-      }
       if (!pattern.test(props.lastReaction.chat_id)) {
         let d = updateChatWithMessageReactions(gChats, props.lastReaction);
         setGChats(d);
+        if (currentChat === props.lastReaction.chat_id) {
+          setData(d);
+        }
       } else {
         let d = updateChatWithMessageReactions(dChats, props.lastReaction);
         setDChats(d);
+        if (currentChat === props.lastReaction.chat_id) {
+          setData(d);
+        }
       }
       updateLists();
+      setUpdateChatBox(Math.random());
     }
   }, [props.lastReaction]);
 
   useEffect(() => {
     if (props.chatGroupMembersUpdated) {
-      if (currentChat === props.chatGroupMembersUpdated.chat_id) {
-        let d = updateChatGroupWithMembers(data, props.chatGroupMembersUpdated);
-        setData(d);
-      }
-
       let d = updateChatGroupWithMembers(gChats, props.chatGroupMembersUpdated);
       setGChats(d);
+      if (currentChat === props.chatGroupMembersUpdated.chat_id) {
+        setData(d);
+      }
       updateLists();
+      setUpdateChatBox(Math.random());
     }
   }, [props.chatGroupMembersUpdated]);
 
   useEffect(() => {
     if (props.newUserAdded) {
       setUsersData([...usersData, props.newUserAdded.data]);
-      updateLists();
+      setUpdateChatBox(Math.random());
     }
   }, [props.newUserAdded]);
 
   useEffect(() => {
     if (props.newGroupAdded) {
       setGChats([...gChats, props.newGroupAdded.data]);
-      updateLists();
+      if (props.page === "Groups") {
+        setData([...data, props.newGroupAdded.data]);
+      }
+      setUpdateChatBox(Math.random());
     }
   }, [props.newGroupAdded]);
 
@@ -299,7 +318,7 @@ function Chats(props) {
               {props.page === "Contact List" && (
                 <UsersList
                   getChat={getChat}
-                  data={data}
+                  data={usersData}
                   searchField={searchField}
                 />
               )}
@@ -314,6 +333,8 @@ function Chats(props) {
               makeCallWith={props.makeCallWith}
               updateGroupMembersWebsocket={props.updateGroupMembers}
               messageSender={props.messageSender}
+              addChatToData={addChatToData}
+              updateChatBox={updateChatBox}
             />
           </Box>
         </>

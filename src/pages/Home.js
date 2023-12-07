@@ -98,6 +98,7 @@ function Home() {
   useEffect(() => {
     if (lastJsonMessage) {
       const resp = JSON.parse(lastJsonMessage);
+      // console.log(resp);
 
       if (resp.type === "reaction") {
         let n = notifyReaction(user.data.id, resp, allUsers, allGroups); // Notification
@@ -132,7 +133,6 @@ function Home() {
       }
 
       if (resp.type === "meeting") {
-        // console.log(resp);
         setCallerUser(resp?.from);
         setMeeting(resp?.meeting);
 
@@ -199,10 +199,10 @@ function Home() {
               iframeRef.style.height = "100%";
             }}
             onApiReady={(externalApi) =>
-              console.log("Jitsi Meet External API", externalApi)
+              console.log("Meet External API Ready", externalApi)
             }
             onReadyToClose={() => {
-              console.log("Jitsi Meet is ready to be closed");
+              console.log("Meet is ready to be closed");
               setIsMeeting(false);
               setMeeting(null);
               setCallerUser(null);

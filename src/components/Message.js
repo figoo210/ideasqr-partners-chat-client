@@ -54,7 +54,7 @@ const Message = (props) => {
     messagesWrapper.scrollTop = messagesWrapper.scrollHeight;
     if (
       props?.message?.parent_message_id &&
-      props?.message?.parent_message_id > 0
+      props?.message?.parent_message_id.length > 1
     ) {
       setIsReply(true);
     } else setIsReply(false);
@@ -67,7 +67,7 @@ const Message = (props) => {
       setReactions(props?.message.reactions);
 
     }
-  }, [props.message]);
+  }, [props?.message.reactions]);
 
   const displayMessage = (msg) => {
     if (msg.includes("https://") || msg.includes("http://")) {

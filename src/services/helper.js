@@ -164,6 +164,9 @@ export const updateChatWithMessageReactions = (array, object) => {
   const msgIndex = array[index].messages.findIndex(item => item.chat_sequance === object.chat_sequance);
 
   if (msgIndex !== -1) {
+    if (!array[index].messages[msgIndex].hasOwnProperty("reactions")) {
+      array[index].messages[msgIndex]["reactions"] = [];
+    }
     const reactionIndex = array[index].messages[msgIndex].reactions.findIndex(item => item.user_id === object.reaction.user_id);
     if (reactionIndex !== -1) {
       array[index].messages[msgIndex].reactions[reactionIndex].reaction = object.reaction.reaction;
@@ -211,7 +214,6 @@ export function showNotification(title, body, iconUrl) {
     console.log('Web notifications not supported in this browser.');
     return;
   }
-  console.log(document.hidden);
 
   if (document.hidden && Notification.permission === 'granted') {
     // If permission is already granted, show the notification.

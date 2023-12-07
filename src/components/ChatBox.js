@@ -7,9 +7,8 @@ import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Tooltip
 import { getOtherChatUserId, generateRandomString } from "../services/helper";
 import { VideoCallOutlined } from "@mui/icons-material";
 import MultipleSelectChip from "./MultiSelect";
+import { v4 as uuidv4 } from 'uuid';
 
-
-let tempMessageId = Math.random();
 
 const ChatBox = (props) => {
   const { user } = useContext(AuthContext);
@@ -80,6 +79,7 @@ const ChatBox = (props) => {
             setChatDisplayName(chat?.chat_name);
             setMembers(chat?.chat_members);
           }
+          props.addChatToData(chat)
           setMessages(chat?.messages);
         });
       }
@@ -89,17 +89,18 @@ const ChatBox = (props) => {
 
 
   useEffect(() => {
-    if (props.data && props.currentChat) {
+
+    if (props.updateChatBox && props.currentChat) {
       getSelectedChat(props.currentChat);
     }
-  }, [props.data]);
+  }, [props.updateChatBox]);
 
 
   // useEffect(() => {
   //   if (props.lastMessage) {
   //     if (props.currentChat === props.lastMessage.chat_id) {
   //       let updatedMessages = updateMessagesWithMessage(messages, props.lastMessage);
-  //       tempMessageId = Math.random();
+  //       uuidMessageId = Math.random();
   //       setMessages(updatedMessages);
   //       props.setUpdateChatNotification(props.lastMessage);
   //     }
@@ -122,22 +123,34 @@ const ChatBox = (props) => {
 
   const handleClickSendMessage = (msg) => {
     if (msg.type === "message") {
+      let uuidMessageId = uuidv4();
+      msg.id = uuidMessageId;
       if (props.currentChat === msg.chat_id) {
         const tempMessage = {
-          id: tempMessageId,
+          id: uuidMessageId,
           chat_id: msg.chat_id,
-          chat_sequance: messages.length > 0 ? messages[messages.length - 1].chat_sequence + 1 : 1,
+          chat_sequance: messages.length > 0 ? messages[messages.length - 1].chat_sequance + 1 : 1,
           message: msg.message,
           sender_id: msg.sender_id,
           parent_message_id: msg?.parent_message_id || 0,
           created_at: new Date(Date.now()).toISOString(),
-          seen: false
+          seen: false,
+          type: "message"
         }
         setMessages(prevMessages => [...prevMessages, tempMessage]);
+        props.messageSender(tempMessage);
+        props.setUpdateChatNotification(props.lastMessage);
       }
       api.createMessage(msg);
     }
-    props.messageSender(msg);
+
+    if (msg.type === "reaction") {
+      props.messageSender(msg);
+    }
+
+    if (msg.type === "edit") {
+      props.messageSender(msg);
+    }
   };
 
   const makeCall = () => {
@@ -252,7 +265,7 @@ const ChatBox = (props) => {
         </Box>
       )}
       <div className="messages-wrapper">
-        {messages?.map((message, idx) => (
+        {messages?.sort((a, b) => new Date(a.created_at) - new Date(b.created_at))?.map((message, idx) => (
           <Message
             key={idx}
             scroll={scroll}
@@ -260,7 +273,7 @@ const ChatBox = (props) => {
             chatId={props.currentChat}
             sendTestMsg={handleClickSendMessage}
             usersData={props.usersData}
-            messages={messages}
+            messages={messages?.sort((a, b) => new Date(a.created_at) - new Date(b.created_at))}
           />
         ))}
       </div>
