@@ -86,9 +86,14 @@ const SendMessage = ({ scroll, chatId, sendTestMsg }) => {
     function getFocusedInput(m) {
       const focusedElement = document.activeElement;
       if (focusedElement.tagName !== 'INPUT') {
-        setMessage(m);
+        if (focusedElement.tagName === "TEXTAREA" && focusedElement.textContent.length > 0) {
+          setMessage(focusedElement.textContent + " " + m);
+        } else {
+          setMessage(m);
+        }
       }
     }
+
     const handleKeyPress = (event) => {
       const shortcuts = user.data.reply_shortcuts;
       if (event.ctrlKey) {

@@ -35,7 +35,11 @@ export default function ReplyPopover(props) {
     function getFocusedInput(m) {
       const focusedElement = document.activeElement;
       if (focusedElement.tagName === 'INPUT') {
-        setReply(m);
+        if (focusedElement.value.length > 0) {
+          setReply(focusedElement.value + " " + m);
+        } else {
+          setReply(m);
+        }
       }
     }
     const handleKeyPress = (event) => {

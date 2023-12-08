@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Tooltip, Typography } from "@mui/material";
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
@@ -8,6 +8,8 @@ import Collapse from "@mui/material/Collapse";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import HubIcon from "@mui/icons-material/Hub";
+import CachedIcon from '@mui/icons-material/Cached';
+import InfoIcon from '@mui/icons-material/Info';
 
 import {
   Edit,
@@ -63,6 +65,10 @@ const NavBar = (props) => {
     setOpen(!open);
   };
 
+  const reloadPage = () => {
+    window.location.reload();
+  }
+
   // Log Out
   const signOut = () => {
     api.logout();
@@ -96,16 +102,23 @@ const NavBar = (props) => {
       <Typography variant="h6" mb={1} mt={1}>
         {user.data.name} {user.data.image_url}
       </Typography>
-      <Button
-        variant="outlined"
-        size="small"
-        sx={{ marginBottom: 2, paddingTop: "5px" }}
-        color="secondary"
-        onClick={signOut}
-      >
-        Log Out
-      </Button>
-
+      <Box sx={{ display: "flex" }}>
+        <Button
+          variant="outlined"
+          size="small"
+          sx={{ marginBottom: 2, paddingTop: "5px" }}
+          color="secondary"
+          onClick={signOut}
+        >
+          Log Out
+        </Button>
+        <Tooltip title="Reload the app" arrow>
+          <span onClick={reloadPage} ><CachedIcon sx={{ ml: 1, mt: 0.6, color: "white", cursor: "pointer" }} /></span>
+        </Tooltip>
+        <Tooltip title={"Message can be edited by double click on it."} placement="right" arrow>
+          <InfoIcon sx={{ ml: 1, mt: 0.6, color: "white", cursor: "pointer" }} />
+        </Tooltip>
+      </Box>
       <List
         sx={{
           width: "80%",

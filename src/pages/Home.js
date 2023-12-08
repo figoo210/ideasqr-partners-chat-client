@@ -10,6 +10,7 @@ import Notification from "../components/Notification";
 import { JitsiMeeting } from "@jitsi/react-sdk";
 import { notifyMessage, notifyReaction } from "../services/helper";
 import Assets from "../assets/data";
+import ConnectionLost from "../components/ConnectionLost";
 
 function Home() {
   const { user } = useContext(AuthContext);
@@ -59,6 +60,7 @@ function Home() {
     [ReadyState.CLOSED]: "Closed",
     [ReadyState.UNINSTANTIATED]: "Uninstantiated",
   }[readyState];
+  const [connectionLost, setConnectionLost] = useState(false);
 
   const makeCallWith = (fromUser, toListOfUsers, meetingInfo) => {
     const call = {
@@ -89,7 +91,7 @@ function Home() {
     console.log(connectionStatus);
     if (connectionStatus === "Closing" || connectionStatus === "Closed") {
       console.log("Connection Closed!!!");
-      window.location.reload();
+      setConnectionLost(true);
     }
 
   }, [connectionStatus]);
@@ -167,7 +169,8 @@ function Home() {
   };
 
   return (
-    <Box sx={{ display: "flex", width: "auto%" }}>
+    <Box sx={{ display: "flex", width: "auto" }}>
+      <ConnectionLost open={connectionLost} />
       <Notification open={notify} handleClose={closeNotification} msg={notification} />
       <Caller
         open={isRinging}
