@@ -142,6 +142,10 @@ export default {
     return Api.get(`/chats/${chat_id}`);
   },
 
+  checkGroupName: (groupName) => {
+    return Api.get(`/chats/check/${groupName}`);
+  },
+
   // Create Message
   createMessage: (message) => {
     return Api.post("/messages/", message);

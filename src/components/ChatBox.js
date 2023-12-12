@@ -4,11 +4,13 @@ import SendMessage from "./SendMessage";
 import api from "../services/api";
 import { AuthContext } from "../services/AuthContext";
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Tooltip, Typography } from "@mui/material";
-import { getOtherChatUserId, generateRandomString } from "../services/helper";
+import { getOtherChatUserId, generateRandomString, updateMessagesWithMessage, updateMessagesWithReaction } from "../services/helper";
 import { VideoCallOutlined } from "@mui/icons-material";
 import MultipleSelectChip from "./MultiSelect";
 import { v4 as uuidv4 } from 'uuid';
 
+
+let messagesNumberToLoad = -100;
 
 const ChatBox = (props) => {
   const { user } = useContext(AuthContext);
@@ -16,9 +18,11 @@ const ChatBox = (props) => {
   const [chatDisplayName, setChatDisplayName] = useState();
 
   const [messages, setMessages] = useState([]);
+  const [allMessages, setAllMessages] = useState([]);
   const [members, setMembers] = useState([]);
 
   const scroll = useRef();
+  const scroller = useRef();
 
 
   const [openDialog, setOpenDialog] = useState(false);
@@ -33,7 +37,7 @@ const ChatBox = (props) => {
     setOpenDialog(false);
   };
 
-  const getSelectedChat = useCallback((chatName) => {
+  const getSelectedChat = useCallback((chatName, messagesToLoad) => {
     let chat = null;
     // setMessages([]);
     if (props?.data) {
@@ -55,7 +59,11 @@ const ChatBox = (props) => {
         setChatDisplayName(chat.chat_name);
         setMembers(chat.chat_members);
       }
-      setMessages(chat.messages);
+      setAllMessages(chat.messages);
+      const sortedMessages = chat.messages.sort((a, b) => {
+        return new Date(a.created_at) - new Date(b.created_at);
+      });
+      setMessages(sortedMessages.slice(messagesToLoad));
       return true;
     } else {
       return false;
@@ -66,7 +74,7 @@ const ChatBox = (props) => {
   useEffect(() => {
     // get chat room if exist and create one if not exist
     if (props.currentChat) {
-      if (!getSelectedChat(props.currentChat)) {
+      if (!getSelectedChat(props.currentChat, messagesNumberToLoad)) {
         api.getChatOrCreate(props.currentChat).then((chat) => {
           if (chat && !chat.is_group && props.usersData) {
             setMembers([]);
@@ -79,33 +87,42 @@ const ChatBox = (props) => {
             setChatDisplayName(chat?.chat_name);
             setMembers(chat?.chat_members);
           }
-          props.addChatToData(chat)
+          props.addChatToData(chat);
           setMessages(chat?.messages);
+          setAllMessages(chat?.messages);
         });
       }
     }
-
   }, [props.currentChat, user.data.id]);
 
 
   useEffect(() => {
-
-    if (props.updateChatBox && props.currentChat) {
-      getSelectedChat(props.currentChat);
+    if (props.lastMessage) {
+      if (props.currentChat === props.lastMessage.chat_id) {
+        let updatedMessages = updateMessagesWithMessage(messages, props.lastMessage);
+        setMessages(updatedMessages);
+        props.setUpdateChatNotification(props.lastMessage);
+      }
     }
-  }, [props.updateChatBox]);
+  }, [props.lastMessage]);
 
+  useEffect(() => {
+    if (props.lastReaction) {
+      if (props.currentChat === props.lastReaction.chat_id) {
+        let updatedMessages = updateMessagesWithReaction(messages, props.lastReaction);
+        setMessages(updatedMessages);
+      }
+    }
+  }, [props.lastReaction]);
 
-  // useEffect(() => {
-  //   if (props.lastMessage) {
-  //     if (props.currentChat === props.lastMessage.chat_id) {
-  //       let updatedMessages = updateMessagesWithMessage(messages, props.lastMessage);
-  //       uuidMessageId = Math.random();
-  //       setMessages(updatedMessages);
-  //       props.setUpdateChatNotification(props.lastMessage);
-  //     }
-  //   }
-  // }, [props.lastMessage]);
+  useEffect(() => {
+    if (props.editedMessage) {
+      if (props.currentChat === props.editedMessage.chat_id) {
+        let updatedMessages = updateMessagesWithMessage(messages, props.editedMessage);
+        setMessages(updatedMessages);
+      }
+    }
+  }, [props.editedMessage]);
 
 
   const updateGroupMembers = (m) => {
@@ -129,15 +146,15 @@ const ChatBox = (props) => {
         const tempMessage = {
           id: uuidMessageId,
           chat_id: msg.chat_id,
-          chat_sequance: messages.length > 0 ? messages[messages.length - 1].chat_sequance + 1 : 1,
           message: msg.message,
           sender_id: msg.sender_id,
-          parent_message_id: msg?.parent_message_id || 0,
+          parent_message_id: msg?.parent_message_id || "0",
           created_at: new Date(Date.now()).toISOString(),
           seen: false,
           type: "message"
         }
-        setMessages(prevMessages => [...prevMessages, tempMessage]);
+        messagesNumberToLoad = -100;
+        setMessages(prevMessages => [...prevMessages, tempMessage].sort((a, b) => new Date(a.created_at) - new Date(b.created_at)).slice(-100));
         props.messageSender(tempMessage);
         props.setUpdateChatNotification(props.lastMessage);
       }
@@ -176,6 +193,29 @@ const ChatBox = (props) => {
       }
     }
   };
+
+
+  useEffect(() => {
+    const loadMessagesOnScroll = () => {
+      if (scroller.current.scrollTop === 0) {
+        // When scrolled to the top, load more messages
+        let test = allMessages;
+        messagesNumberToLoad -= 100;
+        setMessages(test.sort((a, b) => new Date(a.created_at) - new Date(b.created_at)).slice(messagesNumberToLoad));
+      }
+    };
+
+    if (scroller.current) {
+      scroller.current.addEventListener("scroll", loadMessagesOnScroll);
+    }
+
+    return () => {
+      if (scroller.current) {
+        scroller.current.removeEventListener("scroll", loadMessagesOnScroll);
+      }
+    };
+  }, [allMessages]);
+
 
   return (
     <main
@@ -264,7 +304,7 @@ const ChatBox = (props) => {
             )}
         </Box>
       )}
-      <div className="messages-wrapper">
+      <div className="messages-wrapper" ref={scroller}>
         {messages?.sort((a, b) => new Date(a.created_at) - new Date(b.created_at))?.map((message, idx) => (
           <Message
             key={idx}

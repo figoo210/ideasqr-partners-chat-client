@@ -29,7 +29,7 @@ const ConnectionLost = ({ open }) => {
       >
         <img
           src={Assets.noInternet} // Replace with the path to your animated phone icon
-          alt="Phone Icon"
+          alt="Connection Lost"
           width={100}
           height={100}
         />

@@ -30,8 +30,8 @@ export default function ChatList(props) {
       sorted = d;
     }
     sorted.sort((a, b) => {
-      const aLastMessage = a.messages ? a.messages[a.messages.length - 1] : null;
-      const bLastMessage = b.messages ? b.messages[b.messages.length - 1] : null;
+      const aLastMessage = a.messages ? a.messages.sort((m, n) => new Date(m.created_at) - new Date(n.created_at))[a.messages.length - 1] : null;
+      const bLastMessage = b.messages ? b.messages.sort((k, l) => new Date(k.created_at) - new Date(l.created_at))[b.messages.length - 1] : null;
 
       if (!aLastMessage) return 1; // Put chats with no messages at the end
       if (!bLastMessage) return -1;
@@ -77,6 +77,7 @@ export default function ChatList(props) {
           const msg = element.messages[j];
           if (!msg.seen && user.data.id !== msg.sender_id) {
             api.messageSeen(msg.id);
+            props.data[i].messages[j].seen = true;
           }
         }
       }

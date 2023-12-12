@@ -11,6 +11,8 @@ function AddGroup(props) {
   const [name, setName] = useState("");
   const [members, setMembers] = useState([]);
   const [profilePic, setProfilePic] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+  const [isError, setIsError] = useState(false);
 
   const getMembers = (membersList) => {
     !membersList.includes(user.data.id) && membersList.push(user.data.id);
@@ -19,19 +21,28 @@ function AddGroup(props) {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // Handle form submission here
-    const newGroup = {
-      chat_name: name,
-      is_group: true,
-      members: members,
-      image_url: profilePic,
-    };
-    api.createChatGroup(newGroup).then((chat) => {
-      props.getAddedData(chat);
-    });
 
-    // Close modal after save
-    props.closeModal();
+    // check group name
+    api.checkGroupName(name).then((r) => {
+      if (r.data.is_exist) {
+        setIsError(true);
+        setErrorMsg("Group already exist.");
+      } else {
+        // Handle form submission here
+        const newGroup = {
+          chat_name: name,
+          is_group: true,
+          members: members,
+          image_url: profilePic,
+        };
+        api.createChatGroup(newGroup).then((chat) => {
+          props.getAddedData(chat);
+        });
+
+        // Close modal after save
+        props.closeModal();
+      }
+    })
   };
 
   return (
@@ -42,9 +53,15 @@ function AddGroup(props) {
             sx={{ flex: 1, mx: 1 }}
             label="Group Name"
             value={name}
-            onChange={(event) => setName(event.target.value)}
+            onChange={(event) => {
+              setIsError(false);
+              setErrorMsg("");
+              setName(event.target.value);
+            }}
             margin="normal"
             required
+            error={isError}
+            helperText={errorMsg}
           />
           <MultipleSelectChip getMembers={getMembers} />
         </Box>

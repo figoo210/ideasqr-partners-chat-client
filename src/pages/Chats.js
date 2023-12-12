@@ -124,8 +124,6 @@ function Chats(props) {
           setData(d);
         }
       }
-      updateLists();
-      setUpdateChatBox(Math.random());
     }
   }, [props.lastMessage]);
 
@@ -144,8 +142,6 @@ function Chats(props) {
           setData(d);
         }
       }
-      updateLists();
-      setUpdateChatBox(Math.random());
     }
   }, [props.editedMessage]);
 
@@ -164,8 +160,6 @@ function Chats(props) {
           setData(d);
         }
       }
-      updateLists();
-      setUpdateChatBox(Math.random());
     }
   }, [props.lastReaction]);
 
@@ -177,14 +171,12 @@ function Chats(props) {
         setData(d);
       }
       updateLists();
-      setUpdateChatBox(Math.random());
     }
   }, [props.chatGroupMembersUpdated]);
 
   useEffect(() => {
     if (props.newUserAdded) {
       setUsersData([...usersData, props.newUserAdded.data]);
-      setUpdateChatBox(Math.random());
     }
   }, [props.newUserAdded]);
 
@@ -194,7 +186,6 @@ function Chats(props) {
       if (props.page === "Groups") {
         setData([...data, props.newGroupAdded.data]);
       }
-      setUpdateChatBox(Math.random());
     }
   }, [props.newGroupAdded]);
 
@@ -335,6 +326,9 @@ function Chats(props) {
               messageSender={props.messageSender}
               addChatToData={addChatToData}
               updateChatBox={updateChatBox}
+              lastMessage={props.lastMessage}
+              lastReaction={props.lastReaction}
+              editedMessage={props.editedMessage}
             />
           </Box>
         </>
