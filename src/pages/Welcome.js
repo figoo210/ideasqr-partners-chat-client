@@ -77,7 +77,7 @@ const Welcome = () => {
             )}
             <img src={Assets.logoPic} alt="collaborate" width={"100%"} />
             <Typography component="h1" variant="h5">
-              Sign in to chat with with your partners.
+              Sign in to chat with your partners.
             </Typography>
             <TextField
               margin="normal"

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { Box } from "@mui/material";
 import NavBar from "../components/NavBar";
 import Chats from "./Chats";
@@ -11,6 +11,8 @@ import { JitsiMeeting } from "@jitsi/react-sdk";
 import { notifyMessage, notifyReaction } from "../services/helper";
 import Assets from "../assets/data";
 import ConnectionLost from "../components/ConnectionLost";
+import _ from 'lodash';
+
 
 function Home() {
   const { user } = useContext(AuthContext);
@@ -47,6 +49,7 @@ function Home() {
   const { sendJsonMessage, lastJsonMessage, readyState } =
     useWebSocket(socketUrl);
   const [lastMessage, setLastMessage] = useState(null);
+  const [messagesQueue, setMessagesQueue] = useState([]);
   const [editedMessage, setEditedMessage] = useState(null);
   const [lastReaction, setLastReaction] = useState(null);
   const [chatGroupMembersUpdated, setChatGroupMembersUpdated] = useState(null);
@@ -115,6 +118,17 @@ function Home() {
         setNotification(n);
         n && openNotification();
 
+        if (messagesQueue) {
+          if (messagesQueue.length > 0) {
+            if (messagesQueue[0].chat_id === resp.chat_id) {
+              setMessagesQueue((prevBuffer) => [...prevBuffer, resp]);
+            } else {
+              setMessagesQueue([resp]);
+            }
+          } else if (messagesQueue.length === 0) {
+            setMessagesQueue([resp]);
+          }
+        }
         setLastMessage(resp);
       }
 
@@ -171,7 +185,7 @@ function Home() {
   return (
     <Box sx={{ display: "flex", width: "auto" }}>
       <ConnectionLost open={connectionLost} />
-      <Notification open={notify} handleClose={closeNotification} msg={notification} />
+      {/* <Notification open={notify} handleClose={closeNotification} msg={notification} /> */}
       <Caller
         open={isRinging}
         callerUser={callerUser}
@@ -230,6 +244,7 @@ function Home() {
         updateGroupMembers={updateGroupMembers}
         messageSender={messageSender}
         lastMessage={lastMessage}
+        messagesQueue={messagesQueue}
         editedMessage={editedMessage}
         lastReaction={lastReaction}
         chatGroupMembersUpdated={chatGroupMembersUpdated}

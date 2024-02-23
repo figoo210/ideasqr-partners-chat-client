@@ -9,7 +9,7 @@ import AddUser from "../components/AddUser";
 import AddGroup from "../components/AddGroup";
 import api from "../services/api";
 import { AuthContext } from "../services/AuthContext";
-import { updateChatGroupWithMembers, updateChatWithMessage, updateChatWithMessageReactions } from "../services/helper";
+import { isMessageAddedToChat, updateChatGroupWithMembers, updateChatWithMessage, updateChatWithMessageReactions } from "../services/helper";
 import Loading from "./Loading";
 import Assets from "../assets/data";
 
@@ -111,17 +111,24 @@ function Chats(props) {
 
   useEffect(() => {
     if (props.lastMessage) {
-      if (!pattern.test(props.lastMessage.chat_id)) {
-        let d = updateChatWithMessage(gChats, props.lastMessage);
-        setGChats(d);
-        if (currentChat === props.lastMessage.chat_id) {
-          setData(d);
-        }
-      } else {
-        let d = updateChatWithMessage(dChats, props.lastMessage);
-        setDChats(d);
-        if (currentChat === props.lastMessage.chat_id) {
-          setData(d);
+      for (let i = 0; i < props.messagesQueue.length; i++) {
+        const element = props.messagesQueue[i];
+        if (!pattern.test(element.chat_id)) {
+          if (!isMessageAddedToChat(gChats, element)) {
+            let d = updateChatWithMessage(gChats, element);
+            setGChats(d);
+            if (currentChat === element.chat_id) {
+              setData(d);
+            }
+          }
+        } else {
+          if (!isMessageAddedToChat(dChats, element)) {
+            let d = updateChatWithMessage(dChats, element);
+            setDChats(d);
+            if (currentChat === element.chat_id) {
+              setData(d);
+            }
+          }
         }
       }
     }
@@ -170,7 +177,6 @@ function Chats(props) {
       if (currentChat === props.chatGroupMembersUpdated.chat_id) {
         setData(d);
       }
-      updateLists();
     }
   }, [props.chatGroupMembersUpdated]);
 
@@ -327,6 +333,7 @@ function Chats(props) {
               addChatToData={addChatToData}
               updateChatBox={updateChatBox}
               lastMessage={props.lastMessage}
+              messagesQueue={props.messagesQueue}
               lastReaction={props.lastReaction}
               editedMessage={props.editedMessage}
             />

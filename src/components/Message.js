@@ -12,9 +12,8 @@ import {
 import { shortenFileName, shortenString, updateUserLiveReactions } from "../services/helper";
 import { FilePresentOutlined, PlusOne } from "@mui/icons-material";
 import MessageAction from "./MessageAction";
-import CustomModal from "./Modal";
-import AddUser from "./AddUser";
 import EditMessage from "./EditMessage";
+const { DateTime } = require('luxon');
 
 
 const Message = (props) => {
@@ -28,17 +27,26 @@ const Message = (props) => {
   const [editedMessage, setEditedMessage] = useState(null);
 
   const formatTime = (t) => {
-    const localTime = new Date(t).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
+    // Parse the input string using Luxon's fromISO method with offset support
+    const dateTime = DateTime.fromISO(t, { zone: 'Africa/Cairo' });
+
+    // Format the time
+    const formattedTime = dateTime.toLocaleString({
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
     });
-    const localDate = new Date(t).toLocaleDateString([], {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
+
+    // Format the date
+    const formattedDate = dateTime.toLocaleString({
+      year: 'numeric',
+      month: 'short',
+      day: '2-digit',
     });
-    return `${localTime}\n${localDate}`;
-  }
+
+    // Combine the formatted time and date
+    return `${formattedTime}\n${formattedDate}`;
+  };
 
   useEffect(() => {
     if (props?.message) {
@@ -331,7 +339,7 @@ const Message = (props) => {
                         })}
                     </Box>
                     <Typography flex={2} variant="body2" mx={1}>
-                      {reaction?.last_modified_at ? formatTime(reaction?.last_modified_at) : formatTime(Date.now())}
+                      {reaction?.last_modified_at ? formatTime(reaction?.last_modified_at) : formatTime(DateTime.now().setZone("Africa/Cairo").toISO())}
                     </Typography>
                     <Typography flex={1} variant="h6" mx={1}>
                       {reaction.reaction}

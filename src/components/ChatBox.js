@@ -8,9 +8,10 @@ import { getOtherChatUserId, generateRandomString, updateMessagesWithMessage, up
 import { VideoCallOutlined } from "@mui/icons-material";
 import MultipleSelectChip from "./MultiSelect";
 import { v4 as uuidv4 } from 'uuid';
+import { DateTime } from "luxon";
 
 
-let messagesNumberToLoad = -100;
+let messagesNumberToLoad = -30;
 
 const ChatBox = (props) => {
   const { user } = useContext(AuthContext);
@@ -61,9 +62,10 @@ const ChatBox = (props) => {
       }
       setAllMessages(chat.messages);
       const sortedMessages = chat.messages.sort((a, b) => {
-        return new Date(a.created_at) - new Date(b.created_at);
+        return DateTime.fromISO(a.created_at) - DateTime.fromISO(b.created_at);
       });
       setMessages(sortedMessages.slice(messagesToLoad));
+
       return true;
     } else {
       return false;
@@ -98,9 +100,21 @@ const ChatBox = (props) => {
 
   useEffect(() => {
     if (props.lastMessage) {
+      for (let i = 0; i < props.messagesQueue.length; i++) {
+        const element = props.messagesQueue[i];
+        if (allMessages.some(item => item.id === element.id)) {
+          if (props.currentChat === element.chat_id) {
+            let updatedMessages = updateMessagesWithMessage(allMessages, element);
+            setAllMessages(updatedMessages);
+            setMessages(updatedMessages.slice(messagesNumberToLoad));
+            props.setUpdateChatNotification(element);
+          }
+        }
+      }
       if (props.currentChat === props.lastMessage.chat_id) {
-        let updatedMessages = updateMessagesWithMessage(messages, props.lastMessage);
-        setMessages(updatedMessages);
+        let updatedMessages = updateMessagesWithMessage(allMessages, props.lastMessage);
+        setAllMessages(updatedMessages);
+        setMessages(updatedMessages.slice(messagesNumberToLoad));
         props.setUpdateChatNotification(props.lastMessage);
       }
     }
@@ -149,12 +163,12 @@ const ChatBox = (props) => {
           message: msg.message,
           sender_id: msg.sender_id,
           parent_message_id: msg?.parent_message_id || "0",
-          created_at: new Date(Date.now()).toISOString(),
+          created_at: DateTime.now().setZone("Africa/Cairo").toISO(), // new Date(Date.now()).toISOString(),
           seen: false,
           type: "message"
         }
-        messagesNumberToLoad = -100;
-        setMessages(prevMessages => [...prevMessages, tempMessage].sort((a, b) => new Date(a.created_at) - new Date(b.created_at)).slice(-100));
+        messagesNumberToLoad = -30;
+        setMessages(prevMessages => [...prevMessages, tempMessage].slice(-30));
         props.messageSender(tempMessage);
         props.setUpdateChatNotification(props.lastMessage);
       }
@@ -200,8 +214,8 @@ const ChatBox = (props) => {
       if (scroller.current.scrollTop === 0) {
         // When scrolled to the top, load more messages
         let test = allMessages;
-        messagesNumberToLoad -= 100;
-        setMessages(test.sort((a, b) => new Date(a.created_at) - new Date(b.created_at)).slice(messagesNumberToLoad));
+        messagesNumberToLoad -= 30;
+        setMessages(test.slice(messagesNumberToLoad));
       }
     };
 
@@ -305,7 +319,7 @@ const ChatBox = (props) => {
         </Box>
       )}
       <div className="messages-wrapper" ref={scroller}>
-        {messages?.sort((a, b) => new Date(a.created_at) - new Date(b.created_at))?.map((message, idx) => (
+        {messages?.sort((a, b) => DateTime.fromISO(a.created_at) - DateTime.fromISO(b.created_at))?.map((message, idx) => (
           <Message
             key={idx}
             scroll={scroll}
@@ -313,7 +327,7 @@ const ChatBox = (props) => {
             chatId={props.currentChat}
             sendTestMsg={handleClickSendMessage}
             usersData={props.usersData}
-            messages={messages?.sort((a, b) => new Date(a.created_at) - new Date(b.created_at))}
+            messages={messages?.sort((a, b) => DateTime.fromISO(a.created_at, { zone: 'Africa/Cairo' }) - DateTime.fromISO(b.created_at, { zone: 'Africa/Cairo' }))}
           />
         ))}
       </div>

@@ -1,5 +1,5 @@
 import Assets from "../assets/data";
-
+const { DateTime } = require('luxon');
 
 export const timestampToTime = (timestampInSeconds) => {
   const date = new Date(timestampInSeconds * 1000); // convert to milliseconds
@@ -29,6 +29,25 @@ export const getLatestMessageNotification = (messagesList, currentUserId) => {
   }
   return message?.seen ? false : true;
 };
+
+export function currentDateToEgyptTime() {
+  let date = new Date();
+
+  // Get the current time zone offset in minutes
+  const currentOffset = date.getTimezoneOffset();
+
+  // Egypt time zone offset (UTC+2)
+  const egyptOffset = -120;
+
+  // Calculate the difference in minutes between current time zone and Egypt time zone
+  const offsetDifference = currentOffset - egyptOffset;
+
+  // Adjust the time by adding the offset difference
+  const egyptTime = new Date(date.getTime() + (offsetDifference * 60 * 1000));
+
+  // Create a new date object for the adjusted time
+  return egyptTime;
+}
 
 // export const getLatestMessageTime = (messagesList) => {
 //   messagesList.sort((a, b) => a.id - b.id);
@@ -171,7 +190,7 @@ export const updateUserLiveReactions = (array, object) => {
   if (index !== -1) {
     // If the object with the same ID exists, replace it
     array[index].reaction = object.reaction;
-    array[index].last_modified_at = Date.now();
+    array[index].last_modified_at = DateTime.now().setZone("Africa/Cairo").toISO();
   } else {
     array.push(object);
   }
@@ -200,6 +219,9 @@ export const updateChatWithMessageReactions = (array, object) => {
 }
 
 export const updateChatWithMessage = (array, object) => {
+  if (!array || !object) {
+    return [];
+  }
   const index = array.findIndex(item => item.chat_name === object.chat_id);
   if (index !== -1) {
     const msgIndex = array[index].messages.findIndex(item => item.id === object.id);
@@ -213,6 +235,19 @@ export const updateChatWithMessage = (array, object) => {
     }
   }
   return array; // Return the modified array
+}
+
+
+export const isMessageAddedToChat = (array, object) => {
+  if (!array || !object) {
+    return true;
+  }
+  const index = array.findIndex(item => item.chat_name === object.chat_id);
+  if (index !== -1) {
+    return array[index]?.messages.some(item => item.id === object.id);
+  } else {
+    return true;
+  }
 }
 
 
@@ -343,15 +378,18 @@ export const notifyMessage = (currentUserId, msg, users, groups) => {
     return null;
   }
   const isUserInGroupChat = (chatId) => {
-    for (let i = 0; i < groups.length; i++) {
-      if (groups[i].chat_name === chatId) {
-        return groups[i].chat_members?.some((item) => item.user_id === currentUserId);
+    if (groups) {
+      for (let i = 0; i < groups.length; i++) {
+        if (groups[i].chat_name === chatId) {
+          return groups[i].chat_members?.some((item) => item.user_id === currentUserId);
+        }
       }
     }
 
     // If no match is found, you can return a default value (e.g., false) here.
     return false;
   };
+
   if (!checker && msg?.chat_id && !isUserInGroupChat(msg?.chat_id)) {
     return null;
   }

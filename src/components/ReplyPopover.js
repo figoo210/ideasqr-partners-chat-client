@@ -6,9 +6,12 @@ import { AuthContext } from "../services/AuthContext";
 export default function ReplyPopover(props) {
   const { user } = React.useContext(AuthContext);
   const [reply, setReply] = React.useState("");
+  const [msgID, setMsgID] = React.useState("");
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const handleClick = (event) => {
+    console.log(props.messageId);
+    setMsgID(props.messageId);
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
@@ -22,7 +25,7 @@ export default function ReplyPopover(props) {
       chat_id: props.chatId,
       sender_id: user.data.id,
       message: reply,
-      parent_message_id: props.messageId,
+      parent_message_id: msgID,
       type: "message"
     };
     props.sendTestMsg(newMessage);
