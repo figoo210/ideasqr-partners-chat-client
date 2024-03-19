@@ -239,15 +239,17 @@ export const updateChatWithMessage = (array, object) => {
 
 
 export const isMessageAddedToChat = (array, object) => {
-  if (!array || !object) {
-    return true;
-  }
-  const index = array.findIndex(item => item.chat_name === object.chat_id);
-  if (index !== -1) {
-    return array[index]?.messages.some(item => item.id === object.id);
-  } else {
-    return true;
-  }
+  // if (!array || !object) {
+  //   return true;
+  // }
+  // const index = array.findIndex(item => item.chat_name === object.chat_id);
+  // if (index !== -1) {
+  //   console.log("isMessageAddedToChat: ", array[index]?.messages.some(item => item.id === object.id));
+  //   return array[index]?.messages.some(item => item.id === object.id);
+  // } else {
+  //   return true;
+  // }
+  return false;
 }
 
 

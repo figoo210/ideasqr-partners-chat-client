@@ -13,7 +13,7 @@ function EditMessage(props) {
     const handleSave = () => {
         if (updatedMessage && updatedMessage.trim().length > 0 && updatedMessage.trim() !== props.message.message) {
             console.log("Edited!!");
-            props.getEditedMessage(updatedMessage.trim());
+            // props.getEditedMessage(updatedMessage.trim());
             props.setOpen(false);
             let editedMessage = {
                 ...props.message,

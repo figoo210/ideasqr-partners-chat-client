@@ -27,8 +27,18 @@ const Message = (props) => {
   const [editedMessage, setEditedMessage] = useState(null);
 
   const formatTime = (t) => {
-    // Parse the input string using Luxon's fromISO method with offset support
-    const dateTime = DateTime.fromISO(t, { zone: 'Africa/Cairo' });
+    let dateTime;
+
+    // Check if t is a string or timestamp
+    if (typeof t === 'string') {
+      // Parse the input string using Luxon's fromISO method with offset support
+      dateTime = DateTime.fromISO(t, { zone: 'Africa/Cairo' });
+    } else if (typeof t === 'number') {
+      // Convert timestamp to DateTime object
+      dateTime = DateTime.fromMillis(t, { zone: 'Africa/Cairo' });
+    } else {
+      throw new Error('Invalid input type. Expected string or timestamp.');
+    }
 
     // Format the time
     const formattedTime = dateTime.toLocaleString({
@@ -60,6 +70,7 @@ const Message = (props) => {
     // scroll to the bottom of the messages wrapper div
     const messagesWrapper = document.querySelector(".messages-wrapper");
     messagesWrapper.scrollTop = messagesWrapper.scrollHeight;
+
     if (
       props?.message?.parent_message_id &&
       props?.message?.parent_message_id.length > 1
@@ -73,7 +84,6 @@ const Message = (props) => {
     if (props?.message) {
       // Message Reactions
       setReactions(props?.message.reactions);
-
     }
   }, [props?.message.reactions]);
 
@@ -339,7 +349,10 @@ const Message = (props) => {
                         })}
                     </Box>
                     <Typography flex={2} variant="body2" mx={1}>
-                      {reaction?.last_modified_at ? formatTime(reaction?.last_modified_at) : formatTime(DateTime.now().setZone("Africa/Cairo").toISO())}
+                      {reaction?.last_modified_at ?
+                        formatTime(reaction?.last_modified_at) :
+                        formatTime(DateTime.now().setZone("Africa/Cairo").toISO())
+                      }
                     </Typography>
                     <Typography flex={1} variant="h6" mx={1}>
                       {reaction.reaction}
@@ -377,6 +390,7 @@ const Message = (props) => {
               chatId={props.chatId}
               isHover={isHover}
               updateLiveReaction={updateLiveReaction}
+              sender={props.usersData && props.usersData.find((u) => u.id === props.message.sender_id)?.name}
             />
           )}
         </Box>

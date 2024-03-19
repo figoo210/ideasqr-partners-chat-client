@@ -133,6 +133,7 @@ function Home() {
       }
 
       if (resp.type === "edit") {
+        setMessagesQueue([]);
         setEditedMessage(resp);
       }
 

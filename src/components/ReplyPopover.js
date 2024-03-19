@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Box, TextField, Popover, Button } from "@mui/material";
+import { Box, TextField, Popover, Button, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import { SendOutlined } from "@mui/icons-material";
 import { AuthContext } from "../services/AuthContext";
 
@@ -7,11 +7,15 @@ export default function ReplyPopover(props) {
   const { user } = React.useContext(AuthContext);
   const [reply, setReply] = React.useState("");
   const [msgID, setMsgID] = React.useState("");
+  const [msg, setMsg] = React.useState("");
+  const [msgSender, setMsgSender] = React.useState("");
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const handleClick = (event) => {
     console.log(props.messageId);
     setMsgID(props.messageId);
+    setMsg(props.message);
+    setMsgSender(props.sender);
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
@@ -34,6 +38,7 @@ export default function ReplyPopover(props) {
     setAnchorEl(null);
   };
 
+  // Shortcuts handling
   React.useEffect(() => {
     function getFocusedInput(m) {
       const focusedElement = document.activeElement;
@@ -69,71 +74,49 @@ export default function ReplyPopover(props) {
       <Button aria-describedby={id} variant="text" onClick={handleClick}>
         Reply
       </Button>
-      <Popover
-        id={id}
-        open={open}
-        anchorEl={anchorEl}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
-        }}
-      >
-        <form
-          onSubmit={(event) => {
-            event.preventDefault();
-            handleSubmit();
-          }}
-        >
-          <Box sx={{ width: "100%", display: "flex" }}>
-            {/* <Box
-              sx={{
-                bgcolor: "#ddd",
-                width: "100%",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                m: 1,
-                flex: 3,
-              }}
-            >
-              <InputEmoji
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>Reply</DialogTitle>
+        <DialogContent>
+          <p style={{ marginRight: 8, marginLeft: 8 }}>{msgSender}</p>
+          <p style={{ marginRight: 8, marginLeft: 8, marginTop: 3, marginBottom: 5, color: "gray" }}>{msg}</p>
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              handleSubmit();
+            }}
+          >
+            <Box sx={{ width: "100%", display: "flex" }}>
+              <TextField
+                sx={{ flex: 5, mx: 1 }}
+                label="type reply...."
                 value={reply}
-                onChange={messageHandler}
+                onChange={(event) => setReply(event.target.value)}
+                margin="normal"
+                required
                 className="form-input__input"
                 placeholder="type reply..."
                 id="replyInput"
                 name="replyInput"
-                keepOpened
-                onEnter={onEnter}
               />
-            </Box> */}
-            <TextField
-              sx={{ flex: 4, mx: 1 }}
-              label="type reply...."
-              value={reply}
-              onChange={(event) => setReply(event.target.value)}
-              margin="normal"
-              required
-              className="form-input__input"
-              placeholder="type reply..."
-              id="replyInput"
-              name="replyInput"
-            />
 
-            <Button
-              disabled={!reply || reply === "" ? true : false}
-              type="submit"
-              variant="contained"
-              endIcon={<SendOutlined />}
-              color="info"
-              sx={{ flex: 1, m: 1, height: "56px", mt: 2 }}
-            >
-              Reply
-            </Button>
-          </Box>
-        </form>
-      </Popover>
+              <Button
+                disabled={!reply || reply === "" ? true : false}
+                type="submit"
+                variant="contained"
+                endIcon={<SendOutlined />}
+                color="info"
+                sx={{ flex: 1, m: 1, height: "56px", mt: 2 }}
+              >
+                Reply
+              </Button>
+            </Box>
+          </form>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
+        </DialogActions>
+      </Dialog>
+
     </div>
   );
 }

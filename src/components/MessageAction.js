@@ -93,6 +93,8 @@ function MessageAction(props) {
         style={{ flex: 1 }}
         chatId={props.chatId}
         messageId={props.message.id}
+        message={props.message.message}
+        sender={props.sender}
         sendTestMsg={props.sendTestMsg}
         scroll={props.scroll}
       />

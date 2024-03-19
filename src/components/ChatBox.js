@@ -62,7 +62,7 @@ const ChatBox = (props) => {
       }
       setAllMessages(chat.messages);
       const sortedMessages = chat.messages.sort((a, b) => {
-        return DateTime.fromISO(a.created_at) - DateTime.fromISO(b.created_at);
+        return DateTime.fromISO(a.created_at, { zone: 'Africa/Cairo' }) - DateTime.fromISO(b.created_at, { zone: 'Africa/Cairo' });
       });
       setMessages(sortedMessages.slice(messagesToLoad));
 
@@ -106,7 +106,9 @@ const ChatBox = (props) => {
           if (props.currentChat === element.chat_id) {
             let updatedMessages = updateMessagesWithMessage(allMessages, element);
             setAllMessages(updatedMessages);
-            setMessages(updatedMessages.slice(messagesNumberToLoad));
+            setMessages(updatedMessages
+              ?.sort((a, b) => DateTime.fromISO(a.created_at, { zone: 'Africa/Cairo' }) - DateTime.fromISO(b.created_at, { zone: 'Africa/Cairo' }))
+              .slice(messagesNumberToLoad));
             props.setUpdateChatNotification(element);
           }
         }
@@ -114,7 +116,9 @@ const ChatBox = (props) => {
       if (props.currentChat === props.lastMessage.chat_id) {
         let updatedMessages = updateMessagesWithMessage(allMessages, props.lastMessage);
         setAllMessages(updatedMessages);
-        setMessages(updatedMessages.slice(messagesNumberToLoad));
+        setMessages(updatedMessages
+          ?.sort((a, b) => DateTime.fromISO(a.created_at, { zone: 'Africa/Cairo' }) - DateTime.fromISO(b.created_at, { zone: 'Africa/Cairo' }))
+          .slice(messagesNumberToLoad));
         props.setUpdateChatNotification(props.lastMessage);
       }
     }
@@ -123,8 +127,11 @@ const ChatBox = (props) => {
   useEffect(() => {
     if (props.lastReaction) {
       if (props.currentChat === props.lastReaction.chat_id) {
-        let updatedMessages = updateMessagesWithReaction(messages, props.lastReaction);
-        setMessages(updatedMessages);
+        let updatedMessages = updateMessagesWithReaction(allMessages, props.lastReaction);
+        setAllMessages(updatedMessages);
+        setMessages(updatedMessages
+          ?.sort((a, b) => DateTime.fromISO(a.created_at, { zone: 'Africa/Cairo' }) - DateTime.fromISO(b.created_at, { zone: 'Africa/Cairo' }))
+          .slice(messagesNumberToLoad));
       }
     }
   }, [props.lastReaction]);
@@ -132,8 +139,11 @@ const ChatBox = (props) => {
   useEffect(() => {
     if (props.editedMessage) {
       if (props.currentChat === props.editedMessage.chat_id) {
-        let updatedMessages = updateMessagesWithMessage(messages, props.editedMessage);
-        setMessages(updatedMessages);
+        let updatedMessages = updateMessagesWithMessage(allMessages, props.editedMessage);
+        setAllMessages(updatedMessages);
+        setMessages(updatedMessages
+          ?.sort((a, b) => DateTime.fromISO(a.created_at, { zone: 'Africa/Cairo' }) - DateTime.fromISO(b.created_at, { zone: 'Africa/Cairo' }))
+          .slice(messagesNumberToLoad));
       }
     }
   }, [props.editedMessage]);
@@ -171,6 +181,7 @@ const ChatBox = (props) => {
         setMessages(prevMessages => [...prevMessages, tempMessage].slice(-30));
         props.messageSender(tempMessage);
         props.setUpdateChatNotification(props.lastMessage);
+        setAllMessages(prevMessages => [...prevMessages, tempMessage]);
       }
       api.createMessage(msg);
     }
@@ -182,6 +193,7 @@ const ChatBox = (props) => {
     if (msg.type === "edit") {
       props.messageSender(msg);
     }
+
   };
 
   const makeCall = () => {
@@ -215,7 +227,11 @@ const ChatBox = (props) => {
         // When scrolled to the top, load more messages
         let test = allMessages;
         messagesNumberToLoad -= 30;
-        setMessages(test.slice(messagesNumberToLoad));
+        setMessages(
+          test
+            ?.sort((a, b) => DateTime.fromISO(a.created_at, { zone: 'Africa/Cairo' }) - DateTime.fromISO(b.created_at, { zone: 'Africa/Cairo' }))
+            .slice(messagesNumberToLoad)
+        );
       }
     };
 
@@ -319,7 +335,7 @@ const ChatBox = (props) => {
         </Box>
       )}
       <div className="messages-wrapper" ref={scroller}>
-        {messages?.sort((a, b) => DateTime.fromISO(a.created_at) - DateTime.fromISO(b.created_at))?.map((message, idx) => (
+        {messages?.map((message, idx) => (
           <Message
             key={idx}
             scroll={scroll}
@@ -327,7 +343,7 @@ const ChatBox = (props) => {
             chatId={props.currentChat}
             sendTestMsg={handleClickSendMessage}
             usersData={props.usersData}
-            messages={messages?.sort((a, b) => DateTime.fromISO(a.created_at, { zone: 'Africa/Cairo' }) - DateTime.fromISO(b.created_at, { zone: 'Africa/Cairo' }))}
+            messages={messages}
           />
         ))}
       </div>
