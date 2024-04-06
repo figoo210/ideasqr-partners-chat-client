@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useMemo } from "react";
 import { AuthContext } from "../services/AuthContext";
 import InsertEmoticonIcon from "@mui/icons-material/InsertEmoticon";
 import avatar_img from "../assets/img/user.png";
@@ -18,9 +18,8 @@ const { DateTime } = require('luxon');
 
 const Message = (props) => {
   const { user } = useContext(AuthContext);
-  const [messageTime, setMessageTime] = useState("hh:mm PM \n Mon d, yyyy");
   const [reactions, setReactions] = useState([]);
-  const [isReply, setIsReply] = useState(false);
+  const [replyMsgInfo, setReplyMsgInfo] = useState();
   const [isHover, setIsHover] = useState(false);
 
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -59,26 +58,27 @@ const Message = (props) => {
   };
 
   useEffect(() => {
-    if (props?.message) {
-      // Message Time
-      setMessageTime(formatTime(props?.message.created_at));
-
-      // Message Reactions
-      setReactions(props?.message.reactions);
-
-    }
     // scroll to the bottom of the messages wrapper div
     const messagesWrapper = document.querySelector(".messages-wrapper");
     messagesWrapper.scrollTop = messagesWrapper.scrollHeight;
+  }, [props.message]);
 
+  useEffect(() => {
+    // Get reply message
+    if (!props.usersData) return
     if (
       props?.message?.parent_message_id &&
       props?.message?.parent_message_id.length > 1
     ) {
-      setIsReply(true);
-    } else setIsReply(false);
-  }, [props.message]);
-
+      const replyInfo = props?.messages?.find(m => m.id === props.message.parent_message_id)
+      if (!replyInfo) return
+      const replyUserName = props?.usersData?.find(u => u.id === replyInfo?.sender_id)?.name
+      setReplyMsgInfo({
+        message: replyInfo?.message,
+        userName: replyUserName
+      })
+    } else setReplyMsgInfo()
+  }, [props?.userData, props?.message.parent_message_id])
 
   useEffect(() => {
     if (props?.message) {
@@ -209,6 +209,10 @@ const Message = (props) => {
   const getEditedMessage = (m) => {
     setEditedMessage(m);
   }
+
+  const userName = useMemo(() => props.usersData && props.usersData.find((u) => u.id === props.message.sender_id)?.name, [props.message.sender_id])
+  const messageTime = useMemo(() => formatTime(props?.message.created_at) || "hh:mm PM \n Mon d, yyyy", [props?.message.created_at])
+
   if (!props.message) return;
 
   return (
@@ -247,11 +251,9 @@ const Message = (props) => {
               color="darkcyan"
               className="user-name"
             >
-              {props.usersData &&
-                props.usersData.find((u) => u.id === props.message.sender_id)
-                  ?.name}
+              {userName}
             </Typography>
-            {isReply && (
+            {replyMsgInfo && (
               <Box className="chat-bubble-reply">
                 <Typography variant="p">
                   <Button
@@ -273,22 +275,9 @@ const Message = (props) => {
                     }}
                     href={"#" + props?.message.parent_message_id}
                   >
-                    {props.usersData &&
-                      props.messages &&
-                      props.usersData.find(
-                        (u) =>
-                          u.id ===
-                          props.messages.find(
-                            (m) => m.id === props.message.parent_message_id
-                          )?.sender_id
-                      )?.name}
+                    {replyMsgInfo?.userName || ''}
                     <br />"
-                    {props.messages &&
-                      displayReplyMessage(
-                        props.messages.find(
-                          (m) => m.id === props.message.parent_message_id
-                        )?.message || ""
-                      )}
+                    {displayReplyMessage(replyMsgInfo?.message || '')}
                     "
                   </Button>
                 </Typography>
@@ -410,4 +399,5 @@ const Message = (props) => {
   );
 };
 
-export default Message;
+// Memorize component to prevent re-rendering.
+export default React.memo(Message);

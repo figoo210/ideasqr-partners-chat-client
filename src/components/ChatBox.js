@@ -75,54 +75,44 @@ const ChatBox = (props) => {
 
   useEffect(() => {
     // get chat room if exist and create one if not exist
-    if (props.currentChat) {
-      if (!getSelectedChat(props.currentChat, messagesNumberToLoad)) {
-        api.getChatOrCreate(props.currentChat).then((chat) => {
-          if (chat && !chat.is_group && props.usersData) {
-            setMembers([]);
-            props.usersData.forEach((u) => {
-              if (getOtherChatUserId(chat.chat_name, user.data.id) === u.id) {
-                setChatDisplayName(u.name);
-              }
-            });
-          } else {
-            setChatDisplayName(chat?.chat_name);
-            setMembers(chat?.chat_members);
+    if (!props.currentChat) return
+    if (getSelectedChat(props.currentChat, messagesNumberToLoad)) return
+
+    api.getChatOrCreate(props.currentChat).then((chat) => {
+      if (chat && !chat.is_group && props.usersData) {
+        setMembers([]);
+        props.usersData.forEach((u) => {
+          if (getOtherChatUserId(chat.chat_name, user.data.id) === u.id) {
+            setChatDisplayName(u.name);
           }
-          props.addChatToData(chat);
-          setMessages(chat?.messages);
-          setAllMessages(chat?.messages);
         });
+      } else {
+        setChatDisplayName(chat?.chat_name);
+        setMembers(chat?.chat_members);
       }
-    }
+      props.addChatToData(chat);
+      setMessages(chat?.messages);
+      setAllMessages(chat?.messages);
+    });
   }, [props.currentChat, user.data.id]);
 
-
   useEffect(() => {
-    if (props.lastMessage) {
-      for (let i = 0; i < props.messagesQueue.length; i++) {
-        const element = props.messagesQueue[i];
-        if (allMessages.some(item => item.id === element.id)) {
-          if (props.currentChat === element.chat_id) {
-            let updatedMessages = updateMessagesWithMessage(allMessages, element);
-            setAllMessages(updatedMessages);
-            setMessages(updatedMessages
-              ?.sort((a, b) => DateTime.fromISO(a.created_at, { zone: 'Africa/Cairo' }) - DateTime.fromISO(b.created_at, { zone: 'Africa/Cairo' }))
-              .slice(messagesNumberToLoad));
-            props.setUpdateChatNotification(element);
-          }
-        }
+    if (!props.lastMessage) return
+    let updatedMessages = allMessages
+    props.messagesQueue.forEach(element => {
+      if (props.currentChat === element.chat_id) {
+        updatedMessages = updateMessagesWithMessage(updatedMessages, element)
       }
-      if (props.currentChat === props.lastMessage.chat_id) {
-        let updatedMessages = updateMessagesWithMessage(allMessages, props.lastMessage);
-        setAllMessages(updatedMessages);
-        setMessages(updatedMessages
-          ?.sort((a, b) => DateTime.fromISO(a.created_at, { zone: 'Africa/Cairo' }) - DateTime.fromISO(b.created_at, { zone: 'Africa/Cairo' }))
-          .slice(messagesNumberToLoad));
-        props.setUpdateChatNotification(props.lastMessage);
-      }
+    })
+    updatedMessages.sort((a, b) => DateTime.fromISO(a.created_at, { zone: 'Africa/Cairo' }) - DateTime.fromISO(b.created_at, { zone: 'Africa/Cairo' }))
+    setAllMessages(updatedMessages)
+    const update = updatedMessages.slice(messagesNumberToLoad)
+    setMessages(update)
+
+    if (props.currentChat === props.lastMessage.chat_id) {
+      props.setUpdateChatNotification(props.lastMessage)
     }
-  }, [props.lastMessage]);
+  }, [props.lastMessage])
 
   useEffect(() => {
     if (props.lastReaction) {
