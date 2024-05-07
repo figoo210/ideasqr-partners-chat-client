@@ -5,7 +5,7 @@ import api from "../services/api";
 import { AuthContext } from "../services/AuthContext";
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Tooltip, Typography } from "@mui/material";
 import { getOtherChatUserId, generateRandomString, updateMessagesWithMessage, updateMessagesWithReaction } from "../services/helper";
-import { VideoCallOutlined } from "@mui/icons-material";
+import { DeleteForever, DeleteOutline, VideoCallOutlined } from "@mui/icons-material";
 import MultipleSelectChip from "./MultiSelect";
 import { v4 as uuidv4 } from 'uuid';
 import { DateTime } from "luxon";
@@ -17,6 +17,7 @@ const ChatBox = (props) => {
   const { user } = useContext(AuthContext);
 
   const [chatDisplayName, setChatDisplayName] = useState();
+  const [deleting, setDeleting] = useState(false);
 
   const [messages, setMessages] = useState([]);
   const [allMessages, setAllMessages] = useState([]);
@@ -76,6 +77,7 @@ const ChatBox = (props) => {
   useEffect(() => {
     // get chat room if exist and create one if not exist
     if (!props.currentChat) return
+    setDeleting(false);
     if (getSelectedChat(props.currentChat, messagesNumberToLoad)) return
 
     api.getChatOrCreate(props.currentChat).then((chat) => {
@@ -106,8 +108,8 @@ const ChatBox = (props) => {
     })
     updatedMessages.sort((a, b) => DateTime.fromISO(a.created_at, { zone: 'Africa/Cairo' }) - DateTime.fromISO(b.created_at, { zone: 'Africa/Cairo' }))
     setAllMessages(updatedMessages)
-    const update = updatedMessages.slice(messagesNumberToLoad)
-    setMessages(update)
+    // const update = updatedMessages.slice(messagesNumberToLoad)
+    setMessages(updatedMessages.slice(messagesNumberToLoad))
 
     if (props.currentChat === props.lastMessage.chat_id) {
       props.setUpdateChatNotification(props.lastMessage)
@@ -210,6 +212,18 @@ const ChatBox = (props) => {
     }
   };
 
+  const sureDeleting = () => {
+    setDeleting(true);
+  };
+
+  const deleteChat = () => {
+    props.messageSender({
+      type: "group_deleted",
+      data: props.currentChat
+    });
+    props.updateGroupListDelete();
+    api.deleteChat(props.currentChat);
+  };
 
   useEffect(() => {
     const loadMessagesOnScroll = () => {
@@ -300,6 +314,33 @@ const ChatBox = (props) => {
               </>
             )}
           </Typography>
+          {user.role.permissions.some(
+            (perm) => perm.permission === "delete group"
+          ) && (members.length > 0) && (
+              <Button
+                sx={{
+                  bgcolor: deleting ? "red" : "white",
+                  padding: 1,
+                  position: "absolute",
+                  right: 100,
+                  top: 0,
+                  bottom: 0,
+                  margin: "auto",
+                  "&:hover": {
+                    backgroundColor: deleting ? "red" : "white",
+                  },
+                  height: "70%",
+                }}
+                onClick={deleting ? deleteChat : sureDeleting}
+              >
+                {deleting ?
+                  (<>
+                    <Typography sx={{ marginRight: 1, lineHeight: 30 }}>Confirm Deleting?!</Typography>
+                    <DeleteForever sx={{ color: "white", fontSize: 35 }} />
+                  </>) :
+                  (<DeleteOutline sx={{ color: "red", fontSize: 35 }} />)}
+              </Button>
+            )}
           {user.role.permissions.some(
             (perm) => perm.permission === "make calls"
           ) && (

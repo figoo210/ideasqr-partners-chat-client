@@ -61,6 +61,10 @@ function Chats(props) {
     });
   };
 
+  const updateGroupListDelete = () => {
+    setCurrentChat(null);
+  };
+
   const getData = async () => {
     try {
       const [usersResponse, directChatsResponse, groupChatsResponse] = await Promise.all([
@@ -194,6 +198,15 @@ function Chats(props) {
       }
     }
   }, [props.newGroupAdded]);
+
+  useEffect(() => {
+    if (props.groupDeleted) {
+      setGChats([...gChats].filter(item => item.chat_name !== props.groupDeleted.data));
+      if (props.page === "Groups") {
+        setData([...data].filter(item => item.chat_name !== props.groupDeleted.data));
+      }
+    }
+  }, [props.groupDeleted]);
 
 
   return (
@@ -336,6 +349,7 @@ function Chats(props) {
               messagesQueue={props.messagesQueue}
               lastReaction={props.lastReaction}
               editedMessage={props.editedMessage}
+              updateGroupListDelete={updateGroupListDelete}
             />
           </Box>
         </>

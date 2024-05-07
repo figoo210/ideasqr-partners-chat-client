@@ -55,6 +55,7 @@ function Home() {
   const [chatGroupMembersUpdated, setChatGroupMembersUpdated] = useState(null);
   const [newUserAdded, setNewUserAdded] = useState(null);
   const [newGroupAdded, setNewGroupAdded] = useState(null);
+  const [groupDeleted, setGroupDeleted] = useState(null);
 
   const connectionStatus = {
     [ReadyState.CONNECTING]: "Connecting",
@@ -143,6 +144,10 @@ function Home() {
 
       if (resp.type === "new_group_added") {
         setNewGroupAdded(resp);
+      }
+
+      if (resp.type === "group_deleted") {
+        setGroupDeleted(resp);
       }
 
       if (resp.type === "new_user_added") {
@@ -251,6 +256,7 @@ function Home() {
         chatGroupMembersUpdated={chatGroupMembersUpdated}
         newUserAdded={newUserAdded}
         newGroupAdded={newGroupAdded}
+        groupDeleted={groupDeleted}
       />
     </Box>
   );
