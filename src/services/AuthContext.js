@@ -26,8 +26,20 @@ export const AuthProvider = ({ children }) => {
   };
 
   const updateProfile = (updatedProfile) => {
-    setUser(updatedProfile);
-    localStorage.setItem("user", JSON.stringify(updatedProfile));
+    const token = localStorage.getItem("user");
+
+    if (token) {
+      const d = JSON.parse(token);
+
+      // Correctly assign updatedProfile fields to d
+      d.data = updatedProfile;
+
+      // Update state and localStorage
+      setUser(d);
+      localStorage.setItem("user", JSON.stringify(d));
+    } else {
+      console.error("No token found in local storage");
+    }
   };
 
   const updateUserShortcuts = async (objId, reply) => {

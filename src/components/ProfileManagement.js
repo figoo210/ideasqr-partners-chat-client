@@ -1,5 +1,6 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
+  Alert,
   Button,
   Container,
   IconButton,
@@ -26,6 +27,7 @@ const ProfileManagement = () => {
   });
 
   const [showPassword, setShowPassword] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   const validatePassword = (password) => {
     const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
@@ -48,19 +50,26 @@ const ProfileManagement = () => {
     }));
   };
 
-    const getImageUrl = (url) => {
-        setUserUpdated((prevUser) => ({
-            ...prevUser,
-            ["image_url"]: url,
-        }));
-    };
+  const getImageUrl = (url) => {
+    setUserUpdated((prevUser) => ({
+      ...prevUser,
+      ["image_url"]: url,
+    }));
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     // Send the updated user data to the server
     const response = await api.updateUser(user.data.id, userUpdated);
     const updatedUser = await response.data;
-      updateProfile(updatedUser);
+
+    updateProfile(updatedUser);
+
+    // Show success message
+    setShowSuccessMessage(true);
+    setTimeout(() => {
+      setShowSuccessMessage(false);
+    }, 5000); // Hide after 5 seconds
   };
 
   if (loading) {
@@ -73,6 +82,11 @@ const ProfileManagement = () => {
       <Typography variant="h5" align="center" gutterBottom>
         Profile Management
       </Typography>
+      {showSuccessMessage && (
+        <Alert severity="success" sx={{ mb: 2 }}>
+          Profile updated successfully!
+        </Alert>
+      )}
       <form onSubmit={handleSubmit}>
         <TextField
           fullWidth
@@ -84,33 +98,33 @@ const ProfileManagement = () => {
           required
         />
         <TextField
-            fullWidth
-            type={showPassword ? "text" : "password"}
-            label="Password"
-            name="password"
-            value={user.data.password ? user.data.password : userUpdated.password}
-            onChange={handleChange}
-            margin="normal"
-            required
-            error={!validatePassword(userUpdated.password)}
-            helperText={
-              !validatePassword(userUpdated.password)
-                ? "Password must contain at least 8 characters, including at least 1 uppercase letter, 1 lowercase letter, and 1 number."
-                : ""
-            }
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    onClick={handleClickShowPassword}
-                    onMouseDown={handleMouseDownPassword}
-                  >
-                    {showPassword ? <Visibility /> : <VisibilityOff />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
+          fullWidth
+          type={showPassword ? "text" : "password"}
+          label="Password"
+          name="password"
+          value={user.data.password ? user.data.password : userUpdated.password}
+          onChange={handleChange}
+          margin="normal"
+          required
+          error={!validatePassword(userUpdated.password)}
+          helperText={
+            !validatePassword(userUpdated.password)
+              ? "Password must contain at least 8 characters, including at least 1 uppercase letter, 1 lowercase letter, and 1 number."
+              : ""
+          }
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label="toggle password visibility"
+                  onClick={handleClickShowPassword}
+                  onMouseDown={handleMouseDownPassword}
+                >
+                  {showPassword ? <Visibility /> : <VisibilityOff />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
         />
         <TextField
           fullWidth
