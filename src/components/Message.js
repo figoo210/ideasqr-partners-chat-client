@@ -88,55 +88,59 @@ const Message = (props) => {
   }, [props?.message.reactions]);
 
   const displayMessage = (msg) => {
-    if (msg.includes("https://") || msg.includes("http://")) {
-      if (
-        msg.includes(".png") ||
-        msg.includes(".jpeg") ||
-        msg.includes(".jpg")
-      ) {
-        return (
-          <IconButton
-            onClick={() => {
-              // Create a temporary link element
-              const link = document.createElement("a");
-              link.href = msg;
-              link.target = "_blank";
+    if (props?.message.is_file === true) {
+      if (msg.includes("https://") || msg.includes("http://")) {
+        if (
+          msg.includes(".png") ||
+          msg.includes(".jpeg") ||
+          msg.includes(".jpg")
+        ) {
+          return (
+            <IconButton
+              onClick={() => {
+                // Create a temporary link element
+                const link = document.createElement("a");
+                link.href = msg;
+                link.target = "_blank";
 
-              // Simulate a click to trigger the download
-              link.click();
-            }}
-            sx={{
-              // Set cursor to pointer
-              cursor: 'pointer',
-              // Reset other styles to their initial values
-              backgroundColor: 'transparent',
-              border: 'none',
-              padding: 0,
-              margin: 0,
-              color: 'inherit',
-            }}
-          >
-            <img alt="message media" width={300} src={msg} />
-          </IconButton>
-        );
+                // Simulate a click to trigger the download
+                link.click();
+              }}
+              sx={{
+                // Set cursor to pointer
+                cursor: 'pointer',
+                // Reset other styles to their initial values
+                backgroundColor: 'transparent',
+                border: 'none',
+                padding: 0,
+                margin: 0,
+                color: 'inherit',
+              }}
+            >
+              <img alt="message media" width={300} src={msg} />
+            </IconButton>
+          );
+        } else {
+          return (
+            <IconButton
+              onClick={() => {
+                // Create a temporary link element
+                const link = document.createElement("a");
+                link.href = msg;
+                link.target = "_blank";
+
+                // Simulate a click to trigger the download
+                link.click();
+              }}
+              aria-label="Download"
+            >
+              <FilePresentOutlined sx={{ fontSize: 40 }} />
+              {shortenFileName(msg.substring(msg.lastIndexOf("%2F") + 3, msg.lastIndexOf("?")), 10)}
+            </IconButton>
+          );
+        }
       } else {
-        return (
-          <IconButton
-            onClick={() => {
-              // Create a temporary link element
-              const link = document.createElement("a");
-              link.href = msg;
-              link.target = "_blank";
-
-              // Simulate a click to trigger the download
-              link.click();
-            }}
-            aria-label="Download"
-          >
-            <FilePresentOutlined sx={{ fontSize: 40 }} />
-            {shortenFileName(msg.substring(msg.lastIndexOf("%2F") + 3, msg.lastIndexOf("?")), 10)}
-          </IconButton>
-        );
+        return msg;
       }
     } else {
       return msg;

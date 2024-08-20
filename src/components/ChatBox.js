@@ -166,6 +166,7 @@ const ChatBox = (props) => {
           sender_id: msg.sender_id,
           parent_message_id: msg?.parent_message_id || "0",
           created_at: DateTime.now().setZone("Africa/Cairo").toISO(), // new Date(Date.now()).toISOString(),
+          is_file: msg.is_file || false,
           seen: false,
           type: "message"
         }
